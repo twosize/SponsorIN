@@ -59,7 +59,9 @@ class Watchlist(db.Model):
     AthleteID = db.Column(db.Integer, db.ForeignKey('profile.ProfileID'))
     SportsCategory = db.Column(db.String(50))
 
-
+@app.route('/index', methods=['GET'])
+def index():
+    return render_template('index.html')
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -87,6 +89,9 @@ def dashboard():
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
