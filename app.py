@@ -59,14 +59,14 @@ class Watchlist(db.Model):
     AthleteID = db.Column(db.Integer, db.ForeignKey('profile.ProfileID'))
     SportsCategory = db.Column(db.String(50))
 
-@app.route('/index', methods=['GET'])
+@app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -82,15 +82,45 @@ def login():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return "Logged in as: " + current_user.username
+    return render_template('dashboard.html')
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET'])
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        email = request.form.get('email')
+        usertype = request.form.get('usertype')
+
+        print(
+            f"Debug: Received data - Username: {username}, Password: {password}, Email: {email}, UserType: {usertype}")
+
+        user = User.query.filter_by(username=username).first()
+        if user:
+            flash('Username already exists. Please choose a different one.', 'danger')
+            return redirect(url_for('signup'))
+
+        print("Debug: Creating new user...")
+        new_user = User(username=username, email=email, usertype=usertype)
+        new_user.password = password  # This uses the setter we defined
+        db.session.add(new_user)
+        db.session.commit()
+        print(f"Debug: User {username} created successfully!")
+
+        flash('Successfully signed up! You can now log in.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('signup.html')
 
 
 if __name__ == "__main__":
