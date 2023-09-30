@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Account</title>
+</head>
+<body>
+    <h1>Are you sure you want to delete your account?</h1>
+    <form method="POST" action="{{ url_for('delete_account') }}">
+        <label for="password">Please enter your password to confirm account deletion:</label>
+        <input type="password" name="password" required>
+        <input type="submit" value="Yes, Delete My Account">
+    </form>
+    <a href="{{ url_for('dashboard') }}">No, Take Me Back to My Dashboard</a>
+</body>
+</html>
+
+
+
+
+
+

@@ -2,6 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from sqlalchemy.dialects.postgresql import ENUM
+from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash
+from PIL import Image
+import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisshouldbesecret'
@@ -13,6 +17,11 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
+
+UPLOAD_FOLDER = 'static/profile_picture'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 class User(UserMixin, db.Model):
     __tablename__ = 'appuser'
@@ -27,14 +36,14 @@ class User(UserMixin, db.Model):
 
 class Profile(db.Model):
     __tablename__ = 'profile'
-    ProfileID = db.Column(db.Integer, primary_key=True)
-    UserID = db.Column(db.Integer, db.ForeignKey('appuser.userid'), unique=True)
-    FullName = db.Column(db.String(100))
-    Bio = db.Column(db.Text)
-    Gender = db.Column(ENUM('Male', 'Female', 'Other', name='gendertype'))
-    SportsCategory = db.Column(db.String(50))
-    ProfilePicture = db.Column(db.Text)
-    VerifiedStatus = db.Column(db.Boolean, default=False)
+    profileid = db.Column(db.Integer, primary_key=True)
+    userid = db.Column(db.Integer, db.ForeignKey('appuser.userid'), unique=True)
+    fullname = db.Column(db.String(100))
+    bio = db.Column(db.Text)
+    gender = db.Column(ENUM('Male', 'Female', 'Other', name='gendertype'))
+    sportscategory = db.Column(db.String(50))
+    profilepicture = db.Column(db.Text)
+    verifiedstatus = db.Column(db.Boolean, default=False)
 
 class Message(db.Model):
     __tablename__ = 'message'
@@ -68,6 +77,8 @@ def load_user(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -82,7 +93,9 @@ def login():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    profile_exists = Profile.query.filter_by(userid=current_user.userid).first() is not None
+    profile = Profile.query.filter_by(userid=current_user.userid).first()
+    return render_template('dashboard.html', profile_exists=profile_exists, profile=profile)
 
 @app.route('/logout', methods=['GET'])
 @login_required
@@ -112,7 +125,7 @@ def signup():
 
         print("Debug: Creating new user...")
         new_user = User(username=username, email=email, usertype=usertype)
-        new_user.password = password  # This uses the setter we defined
+        new_user.password = password
         db.session.add(new_user)
         db.session.commit()
         print(f"Debug: User {username} created successfully!")
@@ -122,6 +135,203 @@ def signup():
 
     return render_template('signup.html')
 
+
+@app.route('/create_profile', methods=['GET', 'POST'])
+@login_required
+def create_profile():
+    existing_profile = Profile.query.filter_by(userid=current_user.userid).first()
+    if existing_profile:
+        flash('You already have a profile!', 'info')
+        return redirect(url_for('dashboard'))
+    if request.method == 'POST':
+        full_name = request.form.get('full_name')
+        bio = request.form.get('bio')
+        gender = request.form.get('gender')
+        sports_category = request.form.get('sports_category')
+
+        profile_picture = request.files.get('profile_picture')
+        filepath = None
+        if profile_picture and allowed_file(profile_picture.filename):
+            filename = secure_filename(profile_picture.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+
+            with Image.open(profile_picture) as img:
+
+                img = img.resize((256, 256))
+
+                img.save(filepath)
+
+        new_profile = Profile(
+            userid=current_user.userid,
+            fullname=full_name,
+            bio=bio,
+            gender=gender,
+            sportscategory=sports_category,
+            profilepicture=filepath
+        )
+        db.session.add(new_profile)
+        db.session.commit()
+        flash('Profile created successfully!', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template('create_profile.html')
+
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    profile = Profile.query.filter_by(userid=current_user.userid).first()
+    if not profile:
+        flash('No profile found!', 'danger')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        profile.fullname = request.form.get('full_name')
+        profile.bio = request.form.get('bio')
+        profile.gender = request.form.get('gender')
+        profile.sportscategory = request.form.get('sports_category')
+
+        profile_picture = request.files.get('profile_picture')
+        if profile_picture and allowed_file(profile_picture.filename):
+            filename = secure_filename(profile_picture.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+
+            with Image.open(profile_picture) as img:
+
+                img = img.resize((256, 256))
+
+                img.save(filepath)
+
+            relative_filepath = os.path.join('profile_picture', filename)
+            profile.profilepicture = relative_filepath
+
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template('edit_profile.html', profile=profile)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+            return redirect(url_for('uploaded_file', filename=filename))
+
+
+@app.route('/delete_account', methods=['GET', 'POST'])
+@login_required
+def delete_account():
+    profile = Profile.query.filter_by(userid=current_user.userid).first()
+    user = User.query.get(current_user.userid)
+
+    if request.method == 'POST':
+
+        if profile:
+            db.session.delete(profile)
+
+
+        db.session.delete(user)
+        db.session.commit()
+
+        flash('Your account and profile have been deleted', 'success')
+        return redirect(url_for('goodbye'))
+
+    return render_template('delete_account.html')
+@app.route('/goodbye')
+def goodbye():
+    return render_template('goodbye.html')
+
+@app.route('/admin/dashboard')
+@login_required
+def admin_dashboard():
+    if current_user.usertype != 'Admin':
+        flash('Permission Denied: You are not an administrator', 'danger')
+        return redirect(url_for('index'))
+    unverified_profiles = Profile.query.filter_by(verifiedstatus=False).all()
+    users = User.query.all()  # Retrieve all users from the database
+    return render_template('admin_dashboard.html', unverified_profiles=unverified_profiles, users=users)
+
+@app.route('/admin/verify_profile/<int:profile_id>')
+@login_required
+def verify_profile(profile_id):
+    if current_user.usertype != 'Admin':
+        flash('Permission Denied: You are not an administrator', 'danger')
+        return redirect(url_for('index'))
+    profile = Profile.query.get(profile_id)
+    profile.verifiedstatus = True
+    db.session.commit()
+    flash(f'Successfully verified {profile.fullname}', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/edit_user/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def edit_user(user_id):
+    if current_user.usertype != 'Admin':
+        flash('Permission Denied: You are not an administrator', 'danger')
+        return redirect(url_for('index'))
+
+    user = User.query.get(user_id)
+    if user is None:
+        flash('User not found', 'danger')
+        return redirect(url_for('admin_dashboard'))
+
+    if request.method == 'POST':
+        user.username = request.form.get('username')
+        user.email = request.form.get('email')
+        new_password = request.form.get('password')
+
+
+        if new_password:
+            user.password = new_password
+
+
+        new_usertype = request.form.get('usertype')
+        if new_usertype and new_usertype in ['Admin', 'Company', 'Athlete']:
+            user.usertype = new_usertype
+
+
+        db.session.commit()
+        flash(f'Successfully edited {user.username}', 'success')
+        return redirect(url_for('admin_dashboard'))
+
+
+    return render_template('user_edit.html', user=user)
+
+@app.route('/admin/delete_user/<int:user_id>')
+@login_required
+def delete_user(user_id):
+
+    if current_user.usertype != 'Admin':
+        flash('Permission Denied: You are not an administrator', 'danger')
+        return redirect(url_for('index'))
+
+    user = User.query.get(user_id)
+
+    if user is None:
+        flash('User not found', 'danger')
+        return redirect(url_for('admin_dashboard'))
+    db.session.delete(user)
+    db.session.commit()
+    flash(f'Successfully deleted {user.username}', 'success')
+    return redirect(url_for('admin_dashboard'))
 
 if __name__ == "__main__":
     app.run(debug=True)

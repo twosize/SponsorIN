@@ -5,7 +5,7 @@
 <body>
     <h2>Login</h2>
 
-    <!-- Display flashed messages from Flask -->
+
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -14,7 +14,7 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Login Form -->
+
     <form method="post" action="{{ url_for('login') }}">
         <label for="username">Username:</label>
         <input type="text" name="username" required>
@@ -23,5 +23,6 @@
         <input type="submit" value="Login">
     </form>
     <p>Don't have an account? <a href="{{ url_for('signup') }}">Signup</a></p>
+     <a href="{{ url_for('index') }}" class="home-button">Return to Home</a>
 </body>
 </html>

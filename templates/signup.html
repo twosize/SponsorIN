@@ -2,11 +2,22 @@
 <html>
 <head>
     <title>Signup</title>
+    <style>
+        /* Add your CSS styling here */
+        .error {
+            color: red;
+        }
+
+        .info {
+            color: blue;
+        }
+
+        /* Additional styling as needed */
+    </style>
 </head>
 <body>
     <h2>Signup</h2>
 
-    <!-- Display flashed messages from Flask -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -17,24 +28,37 @@
 
     <form method="post" action="{{ url_for('signup') }}">
         <label for="username">Username:</label>
-        <input type="text" name="username" required>
+        <input type="text" name="username" id="username" minlength="3" maxlength="15" required>
 
         <label for="email">Email:</label>
-        <input type="email" name="email" required>
+        <input type="email" name="email" id="email" required>
 
         <label for="password">Password:</label>
-        <input type="password" name="password" required>
+        <input type="password" name="password" id="password" minlength="8" required>
+
+        <label for="password_confirm">Confirm Password:</label>
+        <input type="password" name="password_confirm" id="password_confirm" minlength="8" required oninput="validatePassword()">
 
         <label for="usertype">User Type:</label>
-        <select name="usertype">
+        <select name="usertype" id="usertype">
             <option value="Athlete">Athlete</option>
             <option value="Company">Company</option>
-
         </select>
 
         <input type="submit" value="Signup">
     </form>
 
+    <script>
+        function validatePassword() {
+            if(document.getElementById('password').value !== document.getElementById('password_confirm').value) {
+                document.getElementById('password_confirm').setCustomValidity('Passwords do not match.');
+            } else {
+                document.getElementById('password_confirm').setCustomValidity('');
+            }
+        }
+    </script>
+
     <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+    <a href="{{ url_for('index') }}" class="home-button">Return to Home</a>
 </body>
 </html>

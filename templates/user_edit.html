@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+
+</head>
+<body>
+    <h1>Edit User: {{ user.username }}</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+
+    <form method="POST" action="{{ url_for('edit_user', user_id=user.userid) }}">
+
+
+
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" value="{{ user.username }}" required>
+        <br>
+
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" value="{{ user.email }}" required>
+        <br>
+
+
+        <label for="usertype">User Type:</label>
+        <select name="usertype" id="usertype" required>
+            <option value="Admin" {% if user.usertype == 'Admin' %}selected{% endif %}>Admin</option>
+            <option value="Company" {% if user.usertype == 'Company' %}selected{% endif %}>Company</option>
+            <option value="Athlete" {% if user.usertype == 'Athlete' %}selected{% endif %}>Athlete</option>
+        </select>
+        <br>
+
+
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" value="{{ user.password }}" required>
+        <br>
+
+
+        <input type="submit" value="Update User">
+
+    </form>
+
+
+</body>
+</html>

@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Account Deleted</title>
 </head>
 <body>
-    <h1>SponsorIN</h1>
-
+    <h1>Sorry to see you go!</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flashes">
@@ -18,17 +17,6 @@
         {% endif %}
     {% endwith %}
 
-    {% if not current_user.is_authenticated %}
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
-                <li><a href="{{ url_for('login') }}">Log In</a></li>
-            </ul>
-        </nav>
-    {% else %}
-
-        <a href="{{ url_for('dashboard') }}">Go to Dashboard</a> |
-        <a href="{{ url_for('logout') }}">Logout</a>
-    {% endif %}
+    <a href="{{ url_for('index') }}">Return to homepage</a>
 </body>
 </html>
