@@ -40,7 +40,7 @@
         {% if profile and profile.profilepicture %}
         <img src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture"><br>
         {% endif %}
-        <input type="file" name="profile_picture" accept="image/*"><br>  <!-- Change to file input for uploads -->
+        <input type="file" name="profile_picture" accept="image/*"><br>
 
         <input type="submit" value="Update Profile">
     </form>

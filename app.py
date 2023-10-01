@@ -3,8 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from sqlalchemy.dialects.postgresql import ENUM
 from werkzeug.utils import secure_filename
+from sqlalchemy import and_
 from werkzeug.security import check_password_hash
 from PIL import Image
+from sqlalchemy.orm import relationship
 import os
 
 app = Flask(__name__)
@@ -30,6 +32,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(50), nullable=False)
     usertype = db.Column(ENUM('Admin', 'Company', 'Athlete', name='usertype'), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
+    profile = relationship('Profile', backref='appuser', lazy=True, uselist=False)
 
     def get_id(self):
         return str(self.userid)
@@ -44,6 +47,7 @@ class Profile(db.Model):
     sportscategory = db.Column(db.String(50))
     profilepicture = db.Column(db.Text)
     verifiedstatus = db.Column(db.Boolean, default=False)
+    userid = db.Column(db.Integer, db.ForeignKey('appuser.userid'), unique=True)
 
 class Message(db.Model):
     __tablename__ = 'message'
@@ -155,12 +159,13 @@ def create_profile():
             filename = secure_filename(profile_picture.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-
             with Image.open(profile_picture) as img:
-
                 img = img.resize((256, 256))
-
                 img.save(filepath)
+
+            # Updated code to save relative path into the database
+            relative_filepath = os.path.join('profile_picture', filename)
+            filepath = relative_filepath  # overwrite the filepath variable with the relative path
 
         new_profile = Profile(
             userid=current_user.userid,
@@ -168,7 +173,7 @@ def create_profile():
             bio=bio,
             gender=gender,
             sportscategory=sports_category,
-            profilepicture=filepath
+            profilepicture=filepath  # this now uses the relative path
         )
         db.session.add(new_profile)
         db.session.commit()
@@ -268,17 +273,6 @@ def admin_dashboard():
     users = User.query.all()  # Retrieve all users from the database
     return render_template('admin_dashboard.html', unverified_profiles=unverified_profiles, users=users)
 
-@app.route('/admin/verify_profile/<int:profile_id>')
-@login_required
-def verify_profile(profile_id):
-    if current_user.usertype != 'Admin':
-        flash('Permission Denied: You are not an administrator', 'danger')
-        return redirect(url_for('index'))
-    profile = Profile.query.get(profile_id)
-    profile.verifiedstatus = True
-    db.session.commit()
-    flash(f'Successfully verified {profile.fullname}', 'success')
-    return redirect(url_for('admin_dashboard'))
 
 
 @app.route('/admin/edit_user/<int:user_id>', methods=['GET', 'POST'])
@@ -332,6 +326,87 @@ def delete_user(user_id):
     db.session.commit()
     flash(f'Successfully deleted {user.username}', 'success')
     return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/unverified_profiles')
+@login_required
+def unverified_profiles_page():
+    if current_user.usertype != 'Admin':
+        flash('Permission Denied: You are not an administrator', 'danger')
+        return redirect(url_for('index'))
+
+    unverified_profiles = Profile.query.filter_by(verifiedstatus=False).all()
+    return render_template('unverified_profiles.html', unverified_profiles=unverified_profiles)
+@app.route('/verify_profile/<int:profile_id>', methods=['GET', 'POST'])
+@login_required
+def verify_profile(profile_id):
+
+    profile = Profile.query.get(profile_id)
+    if profile is None:
+        flash('Profile not found', 'danger')
+        return redirect(url_for('unverified_profiles_page'))
+
+    profile.verifiedstatus = True
+    db.session.commit()
+
+    flash('Profile successfully verified', 'success')
+    return redirect(url_for('unverified_profiles_page'))
+@app.route('/admin/user_list', methods=['GET', 'POST'])
+@login_required
+def user_list_page():
+    if current_user.usertype != 'Admin':
+        flash('Permission Denied: You are not an administrator', 'danger')
+        return redirect(url_for('index'))
+
+    search = request.form.get('search')
+    usertype_filter = request.form.get('usertype_filter')
+    gender_filter = request.form.get('gender_filter')
+    verification_filter = request.form.get('verification_filter')
+
+
+    filter_conditions = []
+
+    if search:
+        filter_conditions.append(User.username.ilike(f"%{search}%"))
+
+    if usertype_filter:
+        filter_conditions.append(User.usertype == usertype_filter)
+
+    if gender_filter:
+
+        filter_conditions.append(Profile.gender == gender_filter)
+
+    if verification_filter:
+        verified_status = True if verification_filter == "Verified" else False
+        filter_conditions.append(Profile.verifiedstatus == verified_status)
+
+
+
+    users = User.query.join(Profile, User.userid == Profile.userid, isouter=True).filter(and_(*filter_conditions)).all()
+
+    return render_template('user_list.html', users=users)
+
+
+@app.route('/admin/add_admin', methods=['GET', 'POST'])
+@login_required
+def add_admin():
+    if current_user.usertype != 'Admin':
+        flash('Permission Denied: You are not an administrator', 'danger')
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        email = request.form.get('email')
+
+        new_admin = User(username=username, password=password, email=email, usertype='Admin')
+        db.session.add(new_admin)
+        db.session.commit()
+
+        flash('New admin user successfully created!', 'success')
+        return redirect(url_for('admin_dashboard'))
+
+    return render_template('add_admin.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

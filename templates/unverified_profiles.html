@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unverified Profiles</title>
+</head>
+<body>
+    <h2>Unverified Profiles</h2>
+    <ul>
+    {% for profile in unverified_profiles %}
+        <li>
+            {{ profile.fullname }}
+
+            <a href="{{ url_for('verify_profile', profile_id=profile.profileid) }}">Verify</a>
+        </li>
+    {% endfor %}
+    </ul>
+    <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
