@@ -3,12 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>SponsorIn</title>
+    <style>
+        body, h1, p {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #FFA500;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            position: relative;
+            padding: 0 10px;
+            line-height: 40px;
+        }
+
+        header a::after {
+            content: '|';
+            margin-left: 10px;
+            color: #fff;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        header a:last-child::after {
+            content: none;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .logo img {
+            max-width: 300px;
+            height: auto;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 40px;
+            color: black;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 40px;
+            text-align: justify;
+            color: #333;
+        }
+
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #FFA500;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-to-top:hover {
+            background-color: #FFD700;
+        }
+
+        footer {
+            background-color: #f8f8f8;
+            color: #333;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        footer p:nth-child(1),
+        footer p:nth-child(2),
+        footer p:nth-child(3) {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>SponsorIN</h1>
+    <div class="logo">
+        <img src="/SponsorIN Logo.png" alt="SponsorIn Logo">
+    </div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="aboutus.html">About Us</a>
+            <a href="contactus.html">Contact Us</a>
+            <a href="{{ url_for('signup') }}">Sign Up</a>
+            <a href="{{ url_for('login') }}">Log In</a>
+        </nav>
+    </header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flashes">
                 {% for category, message in messages %}
@@ -19,16 +134,19 @@
     {% endwith %}
 
     {% if not current_user.is_authenticated %}
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
-                <li><a href="{{ url_for('login') }}">Log In</a></li>
-            </ul>
-        </nav>
+        <p>Content for non-authenticated users.</p>
     {% else %}
-
+        <p>Content for authenticated users.</p>
         <a href="{{ url_for('dashboard') }}">Go to Dashboard</a> |
         <a href="{{ url_for('logout') }}">Logout</a>
     {% endif %}
+
+    <button class="back-to-top" onclick="window.scrollTo(0, 0)">Back to Top</button>
+
+    <footer>
+        <p>Email: info@sponsorin.com</p>
+        <p>Phone: 336-336-3636</p>
+        <p>Address: 1400 Spring Garden Street Greensboro, NC 27412</p>
+    </footer>
 </body>
 </html>
