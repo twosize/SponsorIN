@@ -408,5 +408,9 @@ def add_admin():
 
     return render_template('add_admin.html')
 
+@app.route('/about_us')
+def about_us():
+    return render_template('aboutus.html')
+
 if __name__ == "__main__":
     app.run(debug=True)

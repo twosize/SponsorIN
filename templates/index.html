@@ -26,9 +26,12 @@
             </ul>
         </nav>
     {% else %}
-
         <a href="{{ url_for('dashboard') }}">Go to Dashboard</a> |
         <a href="{{ url_for('logout') }}">Logout</a>
     {% endif %}
+    <br>
+
+    <a href="{{ url_for('about_us') }}" class="btn">About Us</a>
 </body>
 </html>
+
