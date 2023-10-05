@@ -1,37 +1,285 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://kit.fontawesome.com/yourcode.js"
+      crossorigin="anonymous"
+    ></script>
+
     <title>Home</title>
-</head>
-<body>
-    <h1>SponsorIN</h1>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <ul class="flashes">
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
-
+  </head>
+  <body class="">
+    <header
+      class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom m-2 p-2 bg-primary-subtle rounded"
+    >
+      <div class="col-md-3 mb-2 mb-md-0">
+        <a
+          href="/"
+          class="d-inline-flex link-body-emphasis text-decoration-none"
+        >
+          <h1>SponsorIN</h1>
+        </a>
+      </div>
+    <div class="col-md-3 text-end">
     {% if not current_user.is_authenticated %}
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
-                <li><a href="{{ url_for('login') }}">Log In</a></li>
-            </ul>
-        </nav>
+        <a href="{{ url_for('login') }}" class="btn btn-outline-primary me-2">Login</a>
+        <a href="{{ url_for('signup') }}" class="btn btn-primary">Sign-up</a>
     {% else %}
-        <a href="{{ url_for('dashboard') }}">Go to Dashboard</a> |
-        <a href="{{ url_for('logout') }}">Logout</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary me-2">Go to Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
     {% endif %}
-    <br>
+</div>
+    </header>
 
-    <a href="{{ url_for('about_us') }}" class="btn">About Us</a>
-</body>
+    <div class="container col-xxl-8 px-4 py-5">
+      <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+        <div class="col-10 col-sm-8 col-lg-6">
+          <img
+            src="https://images.unsplash.com/photo-1512291152593-07033c65b791?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1049&q=80"
+            class="d-block mx-lg-auto img-fluid"
+            alt="Bootstrap Themes"
+            width="700"
+            height="300"
+            loading="lazy"
+          />
+        </div>
+        <div class="col-lg-6">
+          <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">
+            SponsorIN - connecting Athletes and Sponsors
+          </h1>
+          <p class="lead">
+            Are you a college athlete looking to take your career to the next
+            level? Or perhaps you're a sponsor seeking to support and
+            collaborate with promising talents? SponsorIN is here to bridge the
+            gap and revolutionize the way athletes and sponsors connect in the
+            exciting era of Name, Image, and Likeness (NIL) opportunities
+          </p>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <button type="button" class="btn btn-primary btn-lg px-4 me-md-2">
+              Athletes
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-lg px-4">
+              Sponsors
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!---------------------------->
+
+    <!---------------------------->
+    <div class="container px-4 py-5">
+      <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
+        <div class="col d-flex flex-column align-items-start gap-2">
+          <h2 class="fw-bold text-body-emphasis">Features we offer</h2>
+          <p class="text-body-secondary">
+            Ranking system for Athletes. Get noticed for your skills and
+            attributes. Our ranking system helps you showcase your talents and
+            qualities, making it easier for sponsors to identify the athletes
+            that align with their goals.
+          </p>
+          <a href="#" class="btn btn-primary btn-lg">Join Now</a>
+        </div>
+
+        <div class="col">
+          <div class="row row-cols-1 row-cols-sm-2 g-4">
+            <div class="col d-flex flex-column gap-2">
+              <div
+                class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3"
+              >
+                <svg class="bi" width="1em" height="1em">
+                  <use xlink:href=""></use>
+                </svg>
+              </div>
+              <h4 class="fw-semibold mb-0 text-body-emphasis">
+                Social Media Integration
+              </h4>
+              <p class="text-body-secondary">
+                Seamlessly integrate your social media profiles, making it
+                easier for sponsors to discover your unique personality and
+                brand.
+              </p>
+            </div>
+            <div class="col d-flex flex-column gap-2">
+              <div
+                class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3"
+              >
+                <svg class="bi" width="1em" height="1em">
+                  <use xlink:href="#gear-fill"></use>
+                </svg>
+              </div>
+              <h4 class="fw-semibold mb-0 text-body-emphasis">
+                Direct Messaging
+              </h4>
+              <p class="text-body-secondary">
+                Messaging system enables athletes and sponsors to communicate
+                directly, fostering meaningful connections and collaboration.
+                Forge relationships that could define your future success
+              </p>
+            </div>
+
+            <div class="col d-flex flex-column gap-2">
+              <div
+                class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3"
+              >
+                <svg class="bi" width="1em" height="1em">
+                  <use xlink:href="#speedometer"></use>
+                </svg>
+              </div>
+              <h4 class="fw-semibold mb-0 text-body-emphasis">News Feed</h4>
+              <p class="text-body-secondary">
+                Stay informed and ahead of the game with our news feed. Whether
+                it's updates on college-level sports or the corporate world, we
+                keep you in the loop. Discover job offers, industry insights,
+                and opportunities that can shape your future.
+              </p>
+            </div>
+
+            <div class="col d-flex flex-column gap-2">
+              <div
+                class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3"
+              >
+                <svg class="bi" width="1em" height="1em">
+                  <use xlink:href="#table"></use>
+                </svg>
+              </div>
+              <h4 class="fw-semibold mb-0 text-body-emphasis">
+                Exculsive Job Opportunities
+              </h4>
+              <p class="text-body-secondary">
+                Our platform isn't just about connecting with sponsors. We also
+                bring you job offers and opportunities from the corporate world.
+                Your potential goes beyond the field, and we're here to help you
+                unlock it.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container col-xxl-8 px-4 py-5">
+      <div class="row flex-lg align-items-center g-5 py-5">
+        <div class="col-md-7 order-md-2">
+          <h2 class="featurette-heading fw-normal lh-1">
+            NIL Compliance
+            <span class="text-body-secondary">Based on you</span>
+          </h2>
+          <p class="lead">
+            NIL compliance, which stands for "Name, Image, and Likeness," refers
+            to a set of rules and regulations that govern how college athletes
+            can benefit from their own names, images, and likenesses while
+            maintaining their eligibility to compete in collegiate sports. Prior
+            to NIL changes, NCAA (National Collegiate Athletic Association)
+            rules strictly prohibited college athletes from profiting from their
+            own NIL rights.
+          </p>
+        </div>
+        <div class="col-md-5 order-md-1 rounded">
+          <img
+            src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80"
+            class="d-block mx-lg-auto img-fluid"
+            alt="Bootstrap Themes"
+            width="500"
+            height="500"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!------------------------------------------------------------------------------------------------------------------->
+    <div
+      class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3 justify-content-center"
+    >
+      <div
+        class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden rounded"
+        style="
+          background-image: url('https://cdn.taggbox.com/v7/taggbox.com/blog/wp-content/uploads/2018/07/Linkedin-feeds-web.jpg');
+          background-size: cover;
+        "
+      >
+        <div class="my-3 p-3 text-dark" style="position: relative; z-index: 1">
+          <h2 class="display-5 fw-bold">Great reviews</h2>
+          <p class="lead fw-bold">From both Athletes and Sponsors</p>
+        </div>
+        <div
+          class="bg-body shadow-sm mx-auto"
+          style="
+            width: 80%;
+            height: 300px;
+            border-radius: 21px 21px 0 0;
+            position: relative;
+            z-index: 1;
+          "
+        ></div>
+      </div>
+      <div
+        class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden rounded"
+        style="
+          background-image: url('https://media.licdn.com/dms/image/D5612AQFl7da9otyVzQ/article-cover_image-shrink_720_1280/0/1692171504314?e=2147483647&v=beta&t=8u2k5MHjB8yAZ86Je8s_55-fMQTLf0JJ0oHjjOMAZZs');
+          background-size: cover;
+        "
+      >
+        <div class="my-3 p-3 text-dark" style="position: relative; z-index: 1">
+          <h2 class="display-5 fw-bold">Many types of Sponsors</h2>
+          <p class="lead fw-bold">For many sports types, we have a variety of Companies</p>
+        </div>
+        <div
+          class="bg-body shadow-sm mx-auto"
+          style="
+            width: 80%;
+            height: 300px;
+            border-radius: 21px 21px 0 0;
+            position: relative;
+            z-index: 1;
+          "
+        ></div>
+      </div>
+    </div>
+    <!------------------------------------------------------------------------------------------------------------------->
+    <div class="container text-center">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+
+      {% endif %} {% endwith %} {% if not current_user.is_authenticated %} {%
+      else %}
+      <a href="{{ url_for('dashboard') }}">Go to Dashboard</a> |
+      <a href="{{ url_for('logout') }}">Logout</a>
+      {% endif %}
+    </div>
+
+    <div class="container">
+      <footer class="py-3 my-4">
+        <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+          <li class="nav-item">
+            <a href="#" class="nav-link px-2 text-body-secondary">Home</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link px-2 text-body-secondary">Features</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link px-2 text-body-secondary">FAQs</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link px-2 text-body-secondary">About</a>
+          </li>
+        </ul>
+        <p class="text-center text-body-secondary">© 2023 Company, Inc</p>
+      </footer>
+    </div>
+  </body>
 </html>
-
