@@ -29,9 +29,25 @@
         header a {
             color: #fff;
             text-decoration: none;
-            margin: 0 15px;
             font-weight: bold;
             font-size: 18px;
+            position: relative;
+            padding: 0 10px;
+            line-height: 40px;
+        }
+
+        /* Style for the separator */
+        header a::after {
+            content: '|';
+            margin-left: 10px;
+            color: #fff;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        header a:last-child::after {
+            content: none;
         }
 
         .logo {
@@ -99,6 +115,12 @@
         }
 
         footer p {
+            margin: 5px 0;
+        }
+
+        footer p:nth-child(1),
+        footer p:nth-child(2),
+        footer p:nth-child(3) {
             text-align: center;
         }
     </style>
