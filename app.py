@@ -408,7 +408,7 @@ def add_admin():
 
     return render_template('add_admin.html')
 
-@app.route('/about_us')
+@app.route('/aboutus')
 def about_us():
     return render_template('aboutus.html')
 
