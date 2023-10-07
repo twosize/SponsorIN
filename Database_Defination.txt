@@ -1,0 +1,76 @@
+-- Define ENUM types
+CREATE TYPE UserType AS ENUM ('Admin', 'Company', 'Athlete');
+CREATE TYPE GenderType AS ENUM ('Male', 'Female', 'Other');
+CREATE TYPE OfferStatus AS ENUM ('Pending', 'Accepted', 'Declined', 'Counter-offered');
+CREATE TYPE SportsCategoryType AS ENUM ('Basketball', 'Football', 'Soccer');
+
+-- AppUser Table
+CREATE TABLE AppUser (
+    UserID SERIAL PRIMARY KEY,
+    Username VARCHAR(50) UNIQUE NOT NULL,
+    Password VARCHAR(50) NOT NULL,
+    UserType UserType NOT NULL,
+    Email VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Profile Table
+CREATE TABLE Profile (
+    ProfileID SERIAL PRIMARY KEY,
+    UserID INTEGER REFERENCES AppUser(UserID),
+    FullName VARCHAR(100),
+    Bio TEXT,
+    ProfilePicture TEXT,
+    VerifiedStatus BOOLEAN DEFAULT FALSE,
+    UNIQUE (UserID)
+);
+
+-- College Table
+CREATE TABLE College (
+    CollegeID SERIAL PRIMARY KEY,
+    CollegeName VARCHAR(100) NOT NULL UNIQUE
+);
+
+-- AthleteProfile Table
+CREATE TABLE AthleteProfile (
+    AthleteProfileID SERIAL PRIMARY KEY,
+    ProfileID INTEGER REFERENCES Profile(ProfileID),
+    Gender GenderType,
+    SportsCategory SportsCategoryType,
+    CollegeID INTEGER REFERENCES College(CollegeID),
+    UNIQUE (ProfileID)
+);
+
+-- CompanyProfile Table
+CREATE TABLE CompanyProfile (
+    CompanyProfileID SERIAL PRIMARY KEY,
+    ProfileID INTEGER REFERENCES Profile(ProfileID),
+    CompanyName VARCHAR(100) NOT NULL,
+    CompanyLogo TEXT,
+    UNIQUE (ProfileID)
+);
+
+-- Message Table
+CREATE TABLE Message (
+    MessageID SERIAL PRIMARY KEY,
+    SenderID INTEGER REFERENCES AppUser(UserID),
+    ReceiverID INTEGER REFERENCES AppUser(UserID),
+    Content TEXT,
+    Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Offer Table
+CREATE TABLE Offer (
+    OfferID SERIAL PRIMARY KEY,
+    CompanyID INTEGER REFERENCES CompanyProfile(CompanyProfileID),
+    AthleteID INTEGER REFERENCES AthleteProfile(AthleteProfileID),
+    Details TEXT,
+    Status OfferStatus DEFAULT 'Pending'
+);
+
+-- Watchlist Table
+CREATE TABLE Watchlist (
+    WatchlistID SERIAL PRIMARY KEY,
+    CompanyID INTEGER REFERENCES CompanyProfile(CompanyProfileID),
+    AthleteID INTEGER REFERENCES AthleteProfile(AthleteProfileID),
+    SportsCategory SportsCategoryType
+);
