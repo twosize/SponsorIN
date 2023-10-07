@@ -4,41 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4/dist/js/select2.min.js"></script>
+    <style>
+        .select-container {
+            width: 80%; /* Adjust as necessary */
+        }
+        .select2 {
+            width: 80% !important;
+        }
+    </style>
+
+</head>
+<body>
 </head>
 <body>
     <h1>Create Your Profile</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for category, message in messages %}
-      <li class="{{ category }}">{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+        {% if messages %}
+            <ul class=flashes>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 
-    <form action="{{ url_for('create_profile') }}" method="post" enctype="multipart/form-data">
-
-
+    <form action="{{ url_for('create_profile') }}" method="post">
         <label for="full_name">Full Name:</label>
         <input type="text" name="full_name" required><br>
-
         <label for="bio">Bio:</label>
         <textarea name="bio" required></textarea><br>
-
-        <label for="gender">Gender:</label>
-        <select name="gender">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-        </select><br>
-
-        <label for="sports_category">Sports Category:</label>
-        <input type="text" name="sports_category"><br>
-
-        <label for="profile_picture">Profile Picture:</label>
-        <input type="file" name="profile_picture" accept="image/*"><br>
-
+        {% if user_type == 'Athlete' %}
+            <label for="gender">Gender:</label>
+            <select name="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select><br>
+            <label for="sports_category">Sports Category:</label>
+            <select name="sports_category">
+                <option value="Basketball">Basketball</option>
+                <option value="Football">Football</option>
+            </select><br>
+           <div class="select-container">
+                <label for="college">College:</label>
+                <select name="college" id="college" required></select>
+            </div>
+            <script>
+                $(document).ready(function() {
+                    $('#college').select2({
+                        ajax: {
+                            url: '{{ url_for("get_colleges") }}',
+                            dataType: 'json'
+                        }
+                    });
+                });
+            </script>
+        {% endif %}
         <input type="submit" value="Create Profile">
     </form>
 </body>

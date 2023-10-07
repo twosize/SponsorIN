@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit User</title>
-
 </head>
 <body>
     <h1>Edit User: {{ user.username }}</h1>
@@ -17,39 +16,51 @@
         {% endif %}
     {% endwith %}
 
-
     <form method="POST" action="{{ url_for('edit_user', user_id=user.userid) }}">
-
-
 
         <label for="username">Username:</label>
         <input type="text" name="username" id="username" value="{{ user.username }}" required>
         <br>
 
-
         <label for="email">Email:</label>
         <input type="email" name="email" id="email" value="{{ user.email }}" required>
         <br>
 
+        {% if user.profile and user.profile.athlete_profile %}
+            {% if user.usertype == 'Athlete' %}
+                <label for="gender">Gender:</label>
+                <select name="gender" id="gender" required>
+                    <option value="Male" {% if user.profile.athlete_profile.gender == 'Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if user.profile.athlete_profile.gender == 'Female' %}selected{% endif %}>Female</option>
+                    <option value="Other" {% if user.profile.athlete_profile.gender == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+                <br>
 
-        <label for="usertype">User Type:</label>
-        <select name="usertype" id="usertype" required>
-            <option value="Admin" {% if user.usertype == 'Admin' %}selected{% endif %}>Admin</option>
-            <option value="Company" {% if user.usertype == 'Company' %}selected{% endif %}>Company</option>
-            <option value="Athlete" {% if user.usertype == 'Athlete' %}selected{% endif %}>Athlete</option>
-        </select>
-        <br>
+                <label for="sportscategory">Sports Category:</label>
+                <select name="sportscategory" id="sportscategory" required>
+                    <option value="Basketball" {% if user.profile.athlete_profile.sportscategory == 'Basketball' %}selected{% endif %}>Basketball</option>
+                    <option value="Football" {% if user.profile.athlete_profile.sportscategory == 'Football' %}selected{% endif %}>Football</option>
+                    <option value="Soccer" {% if user.profile.athlete_profile.sportscategory == 'Soccer' %}selected{% endif %}>Soccer</option>
+                </select>
+                <br>
 
+                {% if colleges %}
+                    <label for="college">College:</label>
+                    <select name="collegeid" id="college" required>
+                        {% for college in colleges %}
+                            <option value="{{ college.collegeid }}" {% if user.profile.athlete_profile.collegeid == college.collegeid %}selected{% endif %}>{{ college.collegename }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                {% endif %}
+            {% endif %}
+        {% endif %}
 
         <label for="password">Password:</label>
         <input type="password" name="password" id="password" value="{{ user.password }}" required>
         <br>
 
-
         <input type="submit" value="Update User">
-
     </form>
-
-
 </body>
 </html>

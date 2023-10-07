@@ -1,9 +1,21 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <style>
+        .button {
+            /* existing styles... */
+        }
+
+        .profile-picture {
+            width: 100px; /* or any desired size */
+            height: auto;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -18,19 +30,41 @@
 
     <h2>Admin Dashboard</h2>
 
+
+    <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}" alt="Default Profile Picture" >
+
+
+
+
+
     <form action="{{ url_for('unverified_profiles_page') }}" method="get">
-        <input type="submit" value="Unverified Profiles">
+        <input class="button" type="submit" value="Unverified Profiles">
     </form>
 
     <form action="{{ url_for('user_list_page') }}" method="get">
-        <input type="submit" value="User List">
+        <input class="button" type="submit" value="Athlete User List">
     </form>
+
+    <form action="{{ url_for('company_user_list_page') }}" method="get">
+        <input class="button" type="submit" value="Company User List">
+    </form>
+
+     <form action="{{ url_for('admin_user_list_page') }}" method="get">
+        <input class="button" type="submit" value="Admin User List">
+    </form>
+
+
+
 
     <form action="{{ url_for('add_admin') }}" method="get">
-        <input type="submit" value="Add Admin User">
+        <input class="button" type="submit" value="Add Admin User">
     </form>
 
-    <a href="{{ url_for('dashboard') }}">Return to Dashboard</a><br>
+    <form action="{{ url_for('admin_edit', user_id=current_user.userid) }}" method="get">
+        <input class="button" type="submit" value="Edit Account">
+    </form>
+
+      <a href="{{ url_for('logout') }}">Logout</a>
     <a href="{{ url_for('index') }}">Return to Home Page</a>
 </body>
 </html>

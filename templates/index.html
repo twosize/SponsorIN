@@ -246,22 +246,31 @@
       </div>
     </div>
     <!------------------------------------------------------------------------------------------------------------------->
-    <div class="container text-center">
-      {% with messages = get_flashed_messages(with_categories=true) %} {% if
-      messages %}
-      <ul class="flashes">
-        {% for category, message in messages %}
-        <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-      </ul>
+   <div class="container text-center">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 
-      {% endif %} {% endwith %} {% if not current_user.is_authenticated %} {%
-      else %}
-      <a href="{{ url_for('dashboard') }}">Go to Dashboard</a> |
-      <a href="{{ url_for('logout') }}">Logout</a>
-      {% endif %}
-    </div>
+    {% if not current_user.is_authenticated %}
 
+    {% else %}
+        {% if current_user.usertype == 'Admin' %}
+
+            <a href="{{ url_for('admin_dashboard') }}">Go to Admin Dashboard</a>
+        {% else %}
+
+            <a href="{{ url_for('dashboard') }}">Go to Dashboard</a>
+        {% endif %}
+
+        <a href="{{ url_for('logout') }}">Logout</a>
+    {% endif %}
+</div>
     <div class="container">
    <footer class="py-3 my-4">
     <ul class="nav justify-content-center border-bottom pb-3 mb-3">

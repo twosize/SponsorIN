@@ -7,15 +7,36 @@
 </head>
 <body>
     <h2>Unverified Profiles</h2>
-    <ul>
-    {% for profile in unverified_profiles %}
-        <li>
-            {{ profile.fullname }}
+    <table border="1">
+        <form method="POST" action="{{ url_for('unverified_profiles_page') }}">
+            <input type="text" name="search" placeholder="Search unverified profiles...">
+            <input type="submit" value="Search">
+        </form>
+        <tr>
+            <th>Profile Picture</th>
+            <th>User ID</th>
+            <th>Username</th>
 
-            <a href="{{ url_for('verify_profile', profile_id=profile.profileid) }}">Verify</a>
-        </li>
-    {% endfor %}
-    </ul>
+            <th>Actions</th>
+        </tr>
+        {% for profile in unverified_profiles %}
+            <tr>
+                <td>
+                    {% if profile.profilepicture %}
+                        <img src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture" width="30">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='profile_picture/defaultpicture.png') }}" alt="Default Profile Picture" width="30">
+                    {% endif %}
+                </td>
+                <td>{{ profile.appuser.userid }}</td>
+                <td>{{ profile.appuser.username }}</td>
+
+                <td>
+                    <a href="{{ url_for('verify_profile', profile_id=profile.profileid) }}">Verify</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
     <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
 </body>
 </html>

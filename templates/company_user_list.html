@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Company User List</title>
+</head>
+<body>
+    <h2>Company User List</h2>
+    <table border="1">
+        <form method="POST" action="{{ url_for('company_user_list_page') }}">
+            <input type="text" name="search" placeholder="Search companies...">
+            <select name="verification_filter">
+                <option value="">All Verification Status</option>
+                <option value="Verified">Verified</option>
+                <option value="Not Verified">Not Verified</option>
+            </select>
+            <input type="submit" value="Search">
+        </form>
+        <tr>
+            <th>Company Logo</th>
+            <th>User ID</th>
+            <th>Company Name</th>
+            <th>Verified</th>
+            <th>Actions</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>
+                {% if user.profile and user.profile.company_profile and user.profile.company_profile.companylogo %}
+                    <img src="{{ url_for('static', filename=user.profile.company_profile.companylogo) }}" alt="Company Logo" width="30">
+                {% else %}
+
+                    <img src="{{ url_for('static', filename='default_logo.png') }}" alt="Default Logo" width="30">
+                {% endif %}
+            </td>
+            <td>{{ user.userid }}</td>
+            <td>{{ user.profile.company_profile.companyname if user.profile and user.profile.company_profile else 'N/A' }}</td>
+            <td>{{ 'Yes' if user.profile and user.profile.verifiedstatus else 'No' }}</td>
+            <td>
+
+                <a href="{{ url_for('edit_user', user_id=user.userid) }}">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

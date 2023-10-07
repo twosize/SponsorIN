@@ -4,44 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
+     <link href="https://cdn.jsdelivr.net/npm/select2@4/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4/dist/js/select2.min.js"></script>
+    <style>
+        label, input, textarea, select {
+            display: block;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
     <h1>Edit Your Profile</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for category, message in messages %}
-      <li class="{{ category }}">{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 
     <form action="{{ url_for('edit_profile') }}" method="post" enctype="multipart/form-data">
-
         <label for="full_name">Full Name:</label>
-        <input type="text" name="full_name" value="{{ profile.fullname if profile else '' }}" required><br>
+        <input type="text" id="full_name" name="full_name" value="{{ profile.fullname if profile else '' }}" required><br>
 
         <label for="bio">Bio:</label>
-        <textarea name="bio" required>{{ profile.bio if profile else '' }}</textarea><br>
+        <textarea id="bio" name="bio" required>{{ profile.bio if profile else '' }}</textarea><br>
 
         <label for="gender">Gender:</label>
-        <select name="gender">
+        <select id="gender" name="gender">
             <option value="Male" {% if profile and profile.gender == 'Male' %}selected{% endif %}>Male</option>
             <option value="Female" {% if profile and profile.gender == 'Female' %}selected{% endif %}>Female</option>
             <option value="Other" {% if profile and profile.gender == 'Other' %}selected{% endif %}>Other</option>
         </select><br>
 
         <label for="sports_category">Sports Category:</label>
-        <input type="text" name="sports_category" value="{{ profile.sportscategory if profile else '' }}"><br>
+         <select id="sports_category" name="sports_category">
+            <option value="Basketball" {% if profile and profile.sportscategory == 'Basketball' %}selected{% endif %}>Basketball</option>
+            <option value="Football" {% if profile and profile.sportscategory == 'Football' %}selected{% endif %}>Football</option>
+            <option value="Soccer" {% if profile and profile.sportscategory == 'Soccer' %}selected{% endif %}>Soccer</option>
+        </select><br>
+            <label for="college">College:</label>
+            <select name="college" class="js-select2" style="width: 50%;">
+
+            </select><br>
+
+            <script>
+                $(document).ready(function() {
+                    $('.js-select2').select2({
+                        ajax: {
+                            url: '{{ url_for("get_colleges") }}',
+                            dataType: 'json'
+                        }
+                    });
+                });
+            </script>
+
 
         <label for="profile_picture">Profile Picture:</label>
-
         {% if profile and profile.profilepicture %}
-        <img src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture"><br>
+           <img style="width:200px; height:auto;" src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture">
         {% endif %}
-        <input type="file" name="profile_picture" accept="image/*"><br>
-
+        <input type="file" id="profile_picture" name="profile_picture" accept="image/*"><br>
         <input type="submit" value="Update Profile">
     </form>
 </body>

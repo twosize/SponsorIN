@@ -19,38 +19,37 @@
         {% endif %}
     {% endwith %}
 
-    {% if profile_exists %}
-    <h2>Your Profile:</h2>
-    {% if profile and profile.profilepicture %}
-        <img src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture">
-    {% else %}
+  {% if profile and profile.profilepicture %}
+   <img style="width:300px; height:auto;" src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture">
+{% else %}
+    <img src="{{ url_for('static', filename='default-profile-picture.png') }}" alt="Default Profile Picture">
+{% endif %}
 
-        <img src="{{ url_for('static', filename='default-profile-picture.png') }}" alt="Default Profile Picture">
+
+    {% if current_user.usertype == 'Athlete' and athlete_profile %}
+        <p><strong>Full Name:</strong> {{ profile.fullname }}</p>
+         <p><strong>Bio:</strong> {{ profile.bio }}</p>
+        <p><strong>Gender:</strong> {{ athlete_profile.gender }}</p>
+        <p><strong>Sports Category:</strong> {{ athlete_profile.sportscategory }}</p>
+        <p><strong>College:</strong> {{ athlete_profile.college.collegename if athlete_profile.college else 'Not specified' }}</p>
+    {% elif current_user.usertype == 'Company' and company_profile %}
+        <p><strong>Company Name:</strong> {{ company_profile.companyname }}</p>
     {% endif %}
-    <p><strong>Full Name:</strong> {{ profile.fullname }}</p>
-    <p><strong>Bio:</strong> {{ profile.bio }}</p>
-    <p><strong>Gender:</strong> {{ profile.gender }}</p>
-    <p><strong>Sports Category:</strong> {{ profile.sportscategory }}</p>
 
-    {% endif %}
-
-   <nav>
+    <nav>
         <ul>
             {% if not profile_exists %}
-            <li><a href="{{ url_for('create_profile') }}">Create Profile</a></li>
+                <li><a href="{{ url_for('create_profile') }}">Create Profile</a></li>
             {% else %}
-            <li><a href="{{ url_for('edit_profile') }}">Edit Profile</a></li>
+                <li><a href="{{ url_for('edit_profile') }}">Edit Profile</a></li>
             {% endif %}
-            <li><a href="{{ url_for('delete_account') }}" onclick="return confirm('Are you sure you want to delete your account? This action is irreversible.');">
-                Delete Account</a></li>
+            <li><a href="{{ url_for('delete_account') }}" onclick="return confirm('Are you sure you want to delete your account? This action is irreversible.');">Delete Account</a></li>
             <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
     </nav>
-    {% if current_user.usertype == 'Admin' %}
 
-  <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
-{% endif %}
 
- <a href="{{ url_for('index') }}" class="home-button">Return to Home</a>
+
+    <a href="{{ url_for('index') }}" class="home-button">Return to Home</a>
 </body>
 </html>
