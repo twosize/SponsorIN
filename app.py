@@ -141,8 +141,10 @@ def dashboard():
             athlete_profile = AthleteProfile.query.filter_by(profileid=profile.profileid).first()
         elif current_user.usertype == 'Company':
             company_profile = CompanyProfile.query.filter_by(profileid=profile.profileid).first()
+    offers = Offer.query.filter_by(athleteid=current_user.userid,
+                                   status='Pending').all()
 
-    return render_template('dashboard.html', profile=profile, athlete_profile=athlete_profile, company_profile=company_profile, profile_exists=profile_exists)
+    return render_template('dashboard.html', profile=profile, athlete_profile=athlete_profile, company_profile=company_profile, profile_exists=profile_exists,offers=offers)
 
 @app.route('/logout', methods=['GET'])
 @login_required
@@ -181,6 +183,88 @@ def signup():
         return redirect(url_for('login'))
 
     return render_template('signup.html')
+
+@app.route('/view_company')
+@login_required
+def view_company():
+    companies = CompanyProfile.query.all()
+    return render_template('view_company.html', companies=companies)
+
+@app.route('/contact_support')
+@login_required
+def contact_support():
+    admin_users = User.query.filter_by(usertype='Admin').all()
+    return render_template('contact_support.html', users=admin_users)
+
+
+@app.route('/send_message/<int:admin_id>', methods=['GET', 'POST'])
+@login_required
+def send_message(admin_id):
+
+    admin_user = User.query.get(admin_id)
+    if not admin_user or admin_user.usertype != 'Admin':
+        flash('Admin user not found!', 'error')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        message_content = request.form.get('message')
+        if not message_content:
+            flash('Message cannot be empty!', 'error')
+            return render_template('send_message.html', admin_id=admin_id)
+
+        flash('Your message has been sent!', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template('send_message.html', admin_id=admin_id)
+
+
+
+
+@app.route('/offer/accept/<int:offer_id>', methods=['POST'])
+@login_required
+def accept_offer(offer_id):
+    offer = Offer.query.get(offer_id)
+    if offer and offer.athleteid == current_user.id:
+        offer.status = 'Accepted'
+        db.session.commit()
+        flash('Offer accepted successfully', 'success')
+    else:
+        flash('Offer not found or unauthorized action', 'error')
+    return redirect(url_for('view_offers'))
+
+@app.route('/offer/decline/<int:offer_id>', methods=['POST'])
+@login_required
+def decline_offer(offer_id):
+    offer = Offer.query.get(offer_id)
+    if offer and offer.athleteid == current_user.id:
+        offer.status = 'Declined'
+        db.session.commit()
+        flash('Offer declined successfully', 'success')
+    else:
+        flash('Offer not found or unauthorized action', 'error')
+    return redirect(url_for('view_offers'))
+
+@app.route('/offer/counter/<int:offer_id>', methods=['POST'])
+@login_required
+def counter_offer(offer_id):
+    offer = Offer.query.get(offer_id)
+    if offer and offer.athleteid == current_user.id:
+
+        counter_details = request.form.get('counter_details')
+        offer.status = 'Counter-offered'
+        offer.details = counter_details
+        db.session.commit()
+        flash('Offer countered successfully', 'success')
+    else:
+        flash('Offer not found or unauthorized action', 'error')
+    return redirect(url_for('view_offers'))
+
+
+@app.route('/view_offers')
+@login_required
+def view_offers():
+    offers = Offer.query.filter_by(athleteid=current_user.userid, status='Pending').all()
+    return render_template('viewoffers.html', offers=offers)
 
 
 @app.route('/create_profile', methods=['GET', 'POST'])

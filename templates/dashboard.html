@@ -4,6 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+
+       <style>
+        nav ul {
+            padding: 0;
+            list-style: none;
+        }
+        nav ul li {
+            display: inline-block;
+            margin: 5px;
+        }
+        nav ul li a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        nav ul li a:hover {
+            background-color: #0056b3;
+        }
+               .support-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745; /* You can choose a different color */
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px; /* Adjust the margin as needed */
+        }
+
+        .support-button:hover {
+            background-color: #218838; /* Darker green for hover effect, adjust as needed */
+        }
+    </style>
 </head>
 <body>
     <h1>SponsorIN</h1>
@@ -36,6 +71,8 @@
         <p><strong>Company Name:</strong> {{ company_profile.companyname }}</p>
     {% endif %}
 
+
+
     <nav>
         <ul>
             {% if not profile_exists %}
@@ -43,12 +80,15 @@
             {% else %}
                 <li><a href="{{ url_for('edit_profile') }}">Edit Profile</a></li>
             {% endif %}
+            <li><a href="{{ url_for('view_company') }}">View Companies</a></li>
             <li><a href="{{ url_for('delete_account') }}" onclick="return confirm('Are you sure you want to delete your account? This action is irreversible.');">Delete Account</a></li>
+           <li> <a href="{{ url_for('view_offers') }}">View Offers</a></li>
             <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
     </nav>
 
 
+     <a href="{{ url_for('contact_support') }}" class="support-button">Contact Support</a>
 
     <a href="{{ url_for('index') }}" class="home-button">Return to Home</a>
 </body>

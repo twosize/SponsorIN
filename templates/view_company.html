@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Companies</title>
+</head>
+<body>
+    <h1>Companies</h1>
+
+    <ul>
+        {% for company in companies %}
+            <li>
+                <h2>{{ company.companyname }}</h2>
+
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

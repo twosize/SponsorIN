@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Support</title>
+</head>
+<body>
+    <h2>Contact Support</h2>
+
+    <table border="1">
+        <tr>
+            <th>Profile Picture</th>
+            <th>Username</th>
+            <th>Contact</th>
+        </tr>
+        {% for user in users %}
+            {% if user.usertype == 'Admin' %}
+            <tr>
+                <td>
+                     {% if user.profile and user.profile.profilepicture %}
+                        <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture" width="30">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}" alt="Default Profile Picture" width="30">
+                    {% endif %}
+                </td>
+                <td>{{ user.username }}</td>
+                <td>
+                    <a href="{{ url_for('send_message', admin_id=user.userid) }}">Contact</a>
+                </td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

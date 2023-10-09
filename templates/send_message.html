@@ -1,0 +1,17 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Message</title>
+</head>
+<body>
+    <h2>Send Message to Admin</h2>
+    <form method="POST" action="{{ url_for('send_message', admin_id=admin_id) }}">
+        <label for="message">Your Message:</label><br>
+        <textarea name="message" id="message" rows="4" required></textarea><br>
+        <input type="submit" value="Send Message">
+    </form>
+</body>
+</html>
