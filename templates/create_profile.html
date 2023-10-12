@@ -15,15 +15,12 @@
             width: 80% !important;
         }
     </style>
-
-</head>
-<body>
 </head>
 <body>
     <h1>Create Your Profile</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <ul class=flashes>
+            <ul class="flashes">
                 {% for category, message in messages %}
                     <li class="{{ category }}">{{ message }}</li>
                 {% endfor %}
@@ -36,18 +33,21 @@
         <input type="text" name="full_name" required><br>
         <label for="bio">Bio:</label>
         <textarea name="bio" required></textarea><br>
+
         {% if user_type == 'Athlete' %}
             <label for="gender">Gender:</label>
             <select name="gender">
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
             </select><br>
+
             <label for="sports_category">Sports Category:</label>
             <select name="sports_category">
                 <option value="Basketball">Basketball</option>
                 <option value="Football">Football</option>
             </select><br>
-           <div class="select-container">
+
+            <div class="select-container">
                 <label for="college">College:</label>
                 <select name="college" id="college" required></select>
             </div>
@@ -61,7 +61,13 @@
                     });
                 });
             </script>
+        {% elif user_type == 'Company' %}
+            <label for="company_name">Company Name:</label>
+            <input type="text" name="company_name" required><br>
+
+
         {% endif %}
+
         <input type="submit" value="Create Profile">
     </form>
 </body>
