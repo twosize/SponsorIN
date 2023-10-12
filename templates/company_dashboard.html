@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Dashboard</title>
+     <style>
+        nav ul {
+            padding: 0;
+            list-style: none;
+        }
+        nav ul li {
+            display: inline-block;
+            margin: 5px;
+        }
+        nav ul li a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        nav ul li a:hover {
+            background-color: #0056b3;
+        }
+               .support-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745; /* You can choose a different color */
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px; /* Adjust the margin as needed */
+        }
+
+        .support-button:hover {
+            background-color: #218838; /* Darker green for hover effect, adjust as needed */
+        }
+    </style>
+</head>
+<body>
+    <h1> Company Dashboard</h1>
+    <p>You are logged in as: {{ current_user.username }}</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    {% if profile and profile.profilepicture %}
+        <img style="width:300px; height:auto;" src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture">
+    {% else %}
+        <img src="{{ url_for('static', filename='default-profile-picture.png') }}" alt="Default Profile Picture">
+    {% endif %}
+
+    {% if company_profile %}
+        <p><strong>Company Name:</strong> {{ company_profile.companyname }}</p>
+    {% endif %}
+
+    <nav>
+        <ul>
+            {% if not profile_exists %}
+                <li><a href="{{ url_for('create_profile') }}">Create Profile</a></li>
+            {% else %}
+                <li><a href="{{ url_for('edit_profile') }}">Edit Profile</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('delete_account') }}" onclick="return confirm('Are you sure you want to delete your account? This action is irreversible.');">Delete Account</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <a href="{{ url_for('contact_support') }}" class="support-button">Contact Support</a>
+    <a href="{{ url_for('index') }}" class="home-button">Return to Home</a>
+</body>
+</html>
