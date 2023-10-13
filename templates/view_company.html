@@ -4,19 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Companies</title>
+
+
 </head>
 <body>
     <h1>Companies</h1>
 
-    <ul>
-        {% for company in companies %}
-            <li>
-                <h2>{{ company.companyname }}</h2>
+    <form method="POST" action="{{ url_for('view_company') }}">
+        <input type="text" name="search" placeholder="Search by Company Name...">
 
-            </li>
-        {% endfor %}
-    </ul>
+        <input type="submit" value="Search">
+    </form>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Company Logo</th>
+                <th>Company Name</th>
+
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company in companies %}
+                <tr>
+                    <td>
+                        {% if company.companylogo %}
+                            <img src="{{ url_for('static', filename=company.companylogo) }}" alt="Company Logo" width="30">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='company_logo/defaultlogo.png') }}" alt="Default Company Logo" width="30">
+                        {% endif %}
+                    </td>
+                    <td>{{ company.companyname }}</td>
+
+                    <td>
+                        <a href="{{ url_for('view_single_company', company_id=company.companyprofileid) }}">View Details</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+
 </body>
 </html>

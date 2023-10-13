@@ -36,9 +36,9 @@
         {% if current_user.usertype == 'Athlete' %}
             <label for="gender">Gender:</label>
             <select id="gender" name="gender">
-                 <option value="Male" {% if athlete_profile and athlete_profile.gender == 'Male' %}selected{% endif %}>Male</option>
-            <option value="Female" {% if athlete_profile and athlete_profile.gender == 'Female' %}selected{% endif %}>Female</option>
-            <option value="Other" {% if athlete_profile and athlete_profile.gender == 'Other' %}selected{% endif %}>Other</option>
+                <option value="Male" {% if athlete_profile and athlete_profile.gender == 'Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if athlete_profile and athlete_profile.gender == 'Female' %}selected{% endif %}>Female</option>
+                <option value="Other" {% if athlete_profile and athlete_profile.gender == 'Other' %}selected{% endif %}>Other</option>
             </select><br>
 
             <label for="sports_category">Sports Category:</label>
@@ -49,9 +49,7 @@
             </select><br>
 
             <label for="college">College:</label>
-            <select name="college" class="js-select2" style="width: 50%;">
-
-            </select>
+            <select name="college" class="js-select2" style="width: 50%;"></select>
             <script>
                 $(document).ready(function() {
                     $('.js-select2').select2({
@@ -64,11 +62,16 @@
             </script>
         {% endif %}
 
-          {% if current_user.usertype == 'Company' %}
-        <label for="company_name">Company Name:</label>
-        <input type="text" id="company_name" name="company_name" value="{{ company_profile.companyname if company_profile else '' }}" required><br>
-    {% endif %}
+        {% if current_user.usertype == 'Company' %}
+            <label for="company_name">Company Name:</label>
+            <input type="text" id="company_name" name="company_name" value="{{ company_profile.companyname if company_profile else '' }}" required><br>
 
+            <label for="company_logo">Company Logo:</label>
+            {% if company_profile and company_profile.companylogo %}
+                <img style="width:200px; height:auto;" src="{{ url_for('static', filename=company_profile.companylogo) }}" alt="Company Logo">
+            {% endif %}
+            <input type="file" id="company_logo" name="company_logo" accept="image/*"><br>
+        {% endif %}
 
         <label for="profile_picture">Profile Picture:</label>
         {% if profile and profile.profilepicture %}
@@ -79,3 +82,4 @@
     </form>
 </body>
 </html>
+

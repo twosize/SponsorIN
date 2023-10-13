@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ company.companyname }} Details</title>
+    <style>
+        /* You can expand on these styles as needed */
+        img {
+            max-width: 200px;
+            max-height: 200px;
+        }
+        .company-detail {
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="company-detail">
+    <h1>{{ company.companyname }}</h1>
+
+    {% if company.companylogo %}
+        <img src="{{ url_for('static', filename=company.companylogo) }}" alt="{{ company.companyname }} Logo">
+    {% else %}
+        <p>No logo available.</p>
+    {% endif %}
+
+    <h2>Associated Profiles</h2>
+    <ul>
+        {% for profile in company.profile %}
+            <li>
+                <strong>Profile Name:</strong> {{ profile.fullname }}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<a href="{{ url_for('view_company') }}">Back to Companies List</a>
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete User List for Companies</title>
+</head>
+<body>
+<h2>Athlete User List</h2>
+
+<form method="POST" action="{{ url_for('view_athletes') }}">
+    <input type="text" name="search" placeholder="Search by Full Name...">
+
+    <select name="gender_filter">
+        <option value="">All Genders</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+    </select>
+
+    <select name="college">
+        <option value="">All Colleges</option>
+        {% for college in colleges %}
+            <option value="{{ college.collegeid }}">{{ college.collegename }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="sportscategory">
+        <option value="">All Sports</option>
+        {% for sport in sports_categories %}
+            <option value="{{ sport }}">{{ sport }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="submit" value="Search">
+</form>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Profile Picture</th>
+        <th>Full Name</th>
+        <th>Gender</th>
+        <th>College</th>
+        <th>Sports Category</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+        {% if user.profile and user.profile.verifiedstatus %}
+            <tr>
+                <td>
+                    {% if user.profile.profilepicture %}
+                        <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture" width="30">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='profile_picture/defaultpicture.png') }}" alt="Default Profile Picture" width="30">
+                    {% endif %}
+                </td>
+                <td>{{ user.profile.fullname }}</td>
+                <td>{{ user.profile.athlete_profile.gender if user.profile.athlete_profile else 'N/A' }}</td>
+                <td>{{ user.profile.athlete_profile.college.collegename if user.profile.athlete_profile and user.profile.athlete_profile.college else 'N/A' }}</td>
+                <td>{{ user.profile.athlete_profile.sportscategory if user.profile.athlete_profile else 'N/A' }}</td>
+                <td>
+                    <a href="{{ url_for('view_athlete', user_id=user.userid) }}">View</a>
+                </td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('company_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

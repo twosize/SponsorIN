@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete Details</title>
+</head>
+<body>
+
+<h2>{{ athlete.profile.fullname }}'s Profile</h2>
+
+<div>
+    <img src="{{ url_for('static', filename=athlete.profile.profilepicture) }}" alt="Profile Picture" width="150" style="border-radius: 50%;">
+</div>
+
+<table>
+    <tr>
+        <td><strong>Username:</strong></td>
+        <td>{{ athlete.username }}</td>
+    </tr>
+    <tr>
+        <td><strong>Email:</strong></td>
+        <td>{{ athlete.email }}</td>
+    </tr>
+    <tr>
+        <td><strong>Full Name:</strong></td>
+        <td>{{ athlete.profile.fullname }}</td>
+    </tr>
+    <tr>
+        <td><strong>Bio:</strong></td>
+        <td>{{ athlete.profile.bio }}</td>
+    </tr>
+    <tr>
+        <td><strong>Gender:</strong></td>
+        <td>{{ athlete.profile.athlete_profile.gender }}</td>
+    </tr>
+    <tr>
+        <td><strong>Sports Category:</strong></td>
+        <td>{{ athlete.profile.athlete_profile.sportscategory }}</td>
+    </tr>
+    <tr>
+        <td><strong>College:</strong></td>
+        <td>{{ athlete.profile.athlete_profile.college.collegename if athlete.profile.athlete_profile.college else 'N/A' }}</td>
+    </tr>
+</table>
+
+<h3>Actions:</h3>
+
+
+
+<a href="{{ url_for('view_athletes') }}">Back to Athlete List</a>
+
+</body>
+</html>

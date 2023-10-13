@@ -12,6 +12,7 @@ from flask import jsonify
 from sqlalchemy.orm import joinedload
 import os
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisshouldbesecret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://brandontiong:BT2129bt@localhost:5432/sponsorin'
@@ -35,7 +36,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(50), nullable=False)
     usertype = db.Column(Enum('Admin', 'Company', 'Athlete', name='usertype'), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    profile = relationship('Profile', backref='appuser', uselist=False)
+    profile = relationship('Profile', backref='appuser', uselist=False, cascade="all, delete-orphan")
 
     def get_id(self):
         return str(self.userid)
@@ -43,13 +44,13 @@ class User(UserMixin, db.Model):
 class Profile(db.Model):
     __tablename__ = 'profile'
     profileid = db.Column(db.Integer, primary_key=True)
-    userid = db.Column(db.Integer, ForeignKey('appuser.userid'), unique=True)
+    userid = db.Column(db.Integer, ForeignKey('appuser.userid', ondelete='CASCADE'), unique=True)
     fullname = db.Column(db.String(100))
     bio = db.Column(db.Text)
     profilepicture = db.Column(db.Text)
     verifiedstatus = db.Column(db.Boolean, default=False)
-    athlete_profile = relationship('AthleteProfile', backref='profile', uselist=False)
-
+    athlete_profile = relationship('AthleteProfile', backref='profile', uselist=False, cascade="all, delete-orphan")
+    company_profile = db.relationship('CompanyProfile', backref='profile', uselist=False, cascade="all, delete-orphan")
 
 class College(db.Model):
     __tablename__ = 'college'
@@ -65,13 +66,13 @@ class AthleteProfile(db.Model):
     sportscategory = db.Column(Enum('Basketball', 'Football', 'Soccer', name='sportscategorytype'))
     collegeid = db.Column(db.Integer, ForeignKey('college.collegeid'))
 
-
 class CompanyProfile(db.Model):
     __tablename__ = 'companyprofile'
     companyprofileid = db.Column(db.Integer, primary_key=True)
-    profileid = db.Column(db.Integer, ForeignKey('profile.profileid'), unique=True)
+    profileid = db.Column(db.Integer, ForeignKey('profile.profileid', ondelete='CASCADE'), unique=True)
     companyname = db.Column(db.String(100), nullable=False)
     companylogo = db.Column(db.Text)
+
 
 class Message(db.Model):
     __tablename__ = 'message'
@@ -95,6 +96,8 @@ class Watchlist(db.Model):
     companyid = db.Column(db.Integer, ForeignKey('companyprofile.companyprofileid'))
     athleteid = db.Column(db.Integer, ForeignKey('athleteprofile.athleteprofileid'))
     sportscategory = db.Column(Enum('Basketball', 'Football', 'Soccer', name='sportscategorytype'))
+
+
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
@@ -189,6 +192,12 @@ def signup():
 def view_company():
     companies = CompanyProfile.query.all()
     return render_template('view_company.html', companies=companies)
+
+@app.route('/view_single_company/<int:company_id>')
+@login_required
+def view_single_company(company_id):
+    company = CompanyProfile.query.get_or_404(company_id)
+    return render_template('company_detail.html', company=company)
 
 @app.route('/contact_support')
 @login_required
@@ -364,11 +373,23 @@ def edit_profile():
 
         if current_user.usertype == 'Company':
             if not company_profile:
-
-                company_profile = CompanyProfile(profileid=profile.profileid, companyname=request.form.get('company_name'))
+                company_profile = CompanyProfile(profileid=profile.profileid,
+                                                 companyname=request.form.get('company_name'))
                 db.session.add(company_profile)
             else:
                 company_profile.companyname = request.form.get('company_name')
+
+            company_logo = request.files.get('company_logo')
+            if company_logo and allowed_file(company_logo.filename):
+                filename = secure_filename(company_logo.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+                with Image.open(company_logo) as img:
+                    img = img.resize((256, 256))
+                    img.save(filepath)
+
+                relative_filepath = os.path.join('profile_picture', filename)
+                company_profile.companylogo = relative_filepath
 
         db.session.commit()
         flash('Profile updated successfully!', 'success')
@@ -449,6 +470,43 @@ def company_dashboard():
     return render_template('company_dashboard.html', profile=profile, company_profile=company_profile, profile_exists=profile_exists)
 
 
+@app.route('/view_athletes', methods=['GET', 'POST'])
+def view_athletes():
+
+    query = User.query.filter_by(usertype='Athlete').join(Profile, User.profile).filter(
+        Profile.verifiedstatus == True).join(AthleteProfile)
+
+    if request.method == 'POST':
+        search_term = request.form.get('search')
+        if search_term:
+            query = query.filter(Profile.fullname.ilike(f"%{search_term}%"))
+
+        gender_filter = request.form.get('gender_filter')
+        if gender_filter:
+            query = query.filter(AthleteProfile.gender == gender_filter)
+
+        college_filter = request.form.get('college')
+        if college_filter:
+            query = query.filter(AthleteProfile.collegeid == college_filter)
+
+        sports_category_filter = request.form.get('sportscategory')
+        if sports_category_filter:
+            query = query.filter(AthleteProfile.sportscategory == sports_category_filter)
+
+    verified_athletes = query.all()
+    colleges = College.query.all()
+    sports_categories = [c.sportscategory for c in AthleteProfile.query.distinct(AthleteProfile.sportscategory).all()]
+
+    return render_template('athlete_list_for_company.html', users=verified_athletes, colleges=colleges,
+                           sports_categories=sports_categories)
+
+
+@app.route('/athlete/<int:user_id>')
+def view_athlete(user_id):
+
+    athlete = User.query.get_or_404(user_id)
+    return render_template('athlete_detail.html', athlete=athlete)
+
 @app.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
@@ -456,7 +514,7 @@ def admin_dashboard():
         flash('Permission Denied: You are not an administrator', 'danger')
         return redirect(url_for('index'))
     unverified_profiles = Profile.query.filter_by(verifiedstatus=False).all()
-    users = User.query.all()  # Retrieve all users from the database
+    users = User.query.all()
     return render_template('admin_dashboard.html', unverified_profiles=unverified_profiles, users=users)
 
 
@@ -587,10 +645,9 @@ def company_user_list_page():
     if search:
         filter_conditions.append(CompanyProfile.companyname.ilike(f"%{search}%"))
 
-    if verification_filter:
+    if verification_filter and verification_filter != "":
         verified_status = True if verification_filter == "Verified" else False
         filter_conditions.append(Profile.verifiedstatus == verified_status)
-
 
     company_users = User.query.filter(User.usertype == 'Company')
 
@@ -599,7 +656,9 @@ def company_user_list_page():
                 .join(CompanyProfile, Profile.profileid == CompanyProfile.profileid, isouter=True)\
                 .filter(*filter_conditions).all()
 
+
     return render_template('company_user_list.html', users=users)
+
 
 @app.route('/admin/admin_user_list', methods=['GET', 'POST'])
 @login_required
