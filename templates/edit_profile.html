@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile</title>
-     <link href="https://cdn.jsdelivr.net/npm/select2@4/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4/dist/js/select2.min.js"></script>
     <style>
@@ -33,24 +33,25 @@
         <label for="bio">Bio:</label>
         <textarea id="bio" name="bio" required>{{ profile.bio if profile else '' }}</textarea><br>
 
-        <label for="gender">Gender:</label>
-        <select id="gender" name="gender">
-            <option value="Male" {% if profile and profile.gender == 'Male' %}selected{% endif %}>Male</option>
-            <option value="Female" {% if profile and profile.gender == 'Female' %}selected{% endif %}>Female</option>
-            <option value="Other" {% if profile and profile.gender == 'Other' %}selected{% endif %}>Other</option>
-        </select><br>
+        {% if current_user.usertype == 'Athlete' %}
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender">
+                 <option value="Male" {% if athlete_profile and athlete_profile.gender == 'Male' %}selected{% endif %}>Male</option>
+            <option value="Female" {% if athlete_profile and athlete_profile.gender == 'Female' %}selected{% endif %}>Female</option>
+            <option value="Other" {% if athlete_profile and athlete_profile.gender == 'Other' %}selected{% endif %}>Other</option>
+            </select><br>
 
-        <label for="sports_category">Sports Category:</label>
-         <select id="sports_category" name="sports_category">
-            <option value="Basketball" {% if profile and profile.sportscategory == 'Basketball' %}selected{% endif %}>Basketball</option>
-            <option value="Football" {% if profile and profile.sportscategory == 'Football' %}selected{% endif %}>Football</option>
-            <option value="Soccer" {% if profile and profile.sportscategory == 'Soccer' %}selected{% endif %}>Soccer</option>
-        </select><br>
+            <label for="sports_category">Sports Category:</label>
+            <select id="sports_category" name="sports_category">
+                <option value="Basketball" {% if athlete_profile and athlete_profile.sportscategory == 'Basketball' %}selected{% endif %}>Basketball</option>
+                <option value="Football" {% if athlete_profile and athlete_profile.sportscategory == 'Football' %}selected{% endif %}>Football</option>
+                <option value="Soccer" {% if athlete_profile and athlete_profile.sportscategory == 'Soccer' %}selected{% endif %}>Soccer</option>
+            </select><br>
+
             <label for="college">College:</label>
             <select name="college" class="js-select2" style="width: 50%;">
 
-            </select><br>
-
+            </select>
             <script>
                 $(document).ready(function() {
                     $('.js-select2').select2({
@@ -61,11 +62,17 @@
                     });
                 });
             </script>
+        {% endif %}
+
+          {% if current_user.usertype == 'Company' %}
+        <label for="company_name">Company Name:</label>
+        <input type="text" id="company_name" name="company_name" value="{{ company_profile.companyname if company_profile else '' }}" required><br>
+    {% endif %}
 
 
         <label for="profile_picture">Profile Picture:</label>
         {% if profile and profile.profilepicture %}
-           <img style="width:200px; height:auto;" src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture">
+            <img style="width:200px; height:auto;" src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture">
         {% endif %}
         <input type="file" id="profile_picture" name="profile_picture" accept="image/*"><br>
         <input type="submit" value="Update Profile">

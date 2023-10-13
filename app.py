@@ -130,6 +130,8 @@ def login():
 def dashboard():
     if current_user.usertype == 'Admin':
         return redirect(url_for('admin_dashboard'))
+    elif current_user.usertype == 'Company':
+        return redirect(url_for('company_dashboard'))
 
     profile = Profile.query.filter_by(userid=current_user.userid).first()
     profile_exists = profile is not None
@@ -139,12 +141,10 @@ def dashboard():
     if profile_exists:
         if current_user.usertype == 'Athlete':
             athlete_profile = AthleteProfile.query.filter_by(profileid=profile.profileid).first()
-        elif current_user.usertype == 'Company':
-            company_profile = CompanyProfile.query.filter_by(profileid=profile.profileid).first()
-    offers = Offer.query.filter_by(athleteid=current_user.userid,
-                                   status='Pending').all()
 
-    return render_template('dashboard.html', profile=profile, athlete_profile=athlete_profile, company_profile=company_profile, profile_exists=profile_exists,offers=offers)
+    offers = Offer.query.filter_by(athleteid=current_user.userid, status='Pending').all()
+
+    return render_template('dashboard.html', profile=profile, athlete_profile=athlete_profile, company_profile=company_profile, profile_exists=profile_exists, offers=offers)
 
 @app.route('/logout', methods=['GET'])
 @login_required
@@ -279,12 +279,6 @@ def create_profile():
         full_name = request.form.get('full_name')
         bio = request.form.get('bio')
 
-        college_id = request.form.get('college')
-        college = College.query.get(college_id)
-        if not college:
-            flash('Selected college does not exist!', 'danger')
-            return redirect(url_for('create_profile'))
-
         new_profile = Profile(
             userid=current_user.userid,
             fullname=full_name,
@@ -293,13 +287,32 @@ def create_profile():
         db.session.add(new_profile)
         db.session.flush()
 
-        athlete_profile = AthleteProfile(
-            profileid=new_profile.profileid,
-            gender=request.form.get('gender'),
-            sportscategory=request.form.get('sports_category'),
-            collegeid=college_id
-        )
-        db.session.add(athlete_profile)
+        if current_user.usertype == 'Athlete':
+            college_id = request.form.get('college')
+            college = College.query.get(college_id)
+            if not college:
+                flash('Selected college does not exist!', 'danger')
+                return redirect(url_for('create_profile'))
+
+            athlete_profile = AthleteProfile(
+                profileid=new_profile.profileid,
+                gender=request.form.get('gender'),
+                sportscategory=request.form.get('sports_category'),
+                collegeid=college_id
+            )
+            db.session.add(athlete_profile)
+
+        elif current_user.usertype == 'Company':
+            company_name = request.form.get('company_name')
+            company_logo = request.form.get('company_logo')
+
+            company_profile = CompanyProfile(
+                profileid=new_profile.profileid,
+                companyname=company_name,
+                companylogo=company_logo
+            )
+            db.session.add(company_profile)
+
         db.session.commit()
 
         flash('Profile created successfully!', 'success')
@@ -326,6 +339,7 @@ def edit_profile():
         return redirect(url_for('dashboard'))
 
     athlete_profile = AthleteProfile.query.filter_by(profileid=profile.profileid).first()
+    company_profile = CompanyProfile.query.filter_by(profileid=profile.profileid).first()
 
     if request.method == 'POST':
         profile.fullname = request.form.get('full_name')
@@ -348,12 +362,20 @@ def edit_profile():
             athlete_profile.sportscategory = request.form.get('sports_category')
             athlete_profile.collegeid = request.form.get('college')
 
+        if current_user.usertype == 'Company':
+            if not company_profile:
+
+                company_profile = CompanyProfile(profileid=profile.profileid, companyname=request.form.get('company_name'))
+                db.session.add(company_profile)
+            else:
+                company_profile.companyname = request.form.get('company_name')
+
         db.session.commit()
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('dashboard'))
 
     colleges = College.query.all()
-    return render_template('edit_profile.html', profile=profile, athlete_profile=athlete_profile, colleges=colleges)
+    return render_template('edit_profile.html', profile=profile, athlete_profile=athlete_profile, company_profile=company_profile, colleges=colleges)
 
 
 def allowed_file(filename):
@@ -408,6 +430,24 @@ def delete_account():
 @app.route('/goodbye')
 def goodbye():
     return render_template('goodbye.html')
+
+
+@app.route('/company_dashboard')
+@login_required
+def company_dashboard():
+    if current_user.usertype != 'Company':
+        flash('Unauthorized access.', 'error')
+        return redirect(url_for('dashboard'))
+
+    profile = Profile.query.filter_by(userid=current_user.userid).first()
+    profile_exists = profile is not None
+    company_profile = None
+
+    if profile_exists:
+        company_profile = CompanyProfile.query.filter_by(profileid=profile.profileid).first()
+
+    return render_template('company_dashboard.html', profile=profile, company_profile=company_profile, profile_exists=profile_exists)
+
 
 @app.route('/admin/dashboard')
 @login_required
