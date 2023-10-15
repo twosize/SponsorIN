@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import and_
 from werkzeug.security import check_password_hash
 from PIL import Image
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, Boolean, Enum, TIMESTAMP, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
@@ -470,6 +471,85 @@ def company_dashboard():
     return render_template('company_dashboard.html', profile=profile, company_profile=company_profile, profile_exists=profile_exists)
 
 
+@app.route('/company_dashboard/watchlist')
+@login_required
+def view_watchlist():
+    company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+
+
+    watchlist_athletes = db.session.query(AthleteProfile, Profile) \
+        .join(Profile, AthleteProfile.profileid == Profile.profileid) \
+        .join(Watchlist, Watchlist.athleteid == AthleteProfile.athleteprofileid) \
+        .filter(Watchlist.companyid == company_profile.companyprofileid).all()
+
+    return render_template('watchlist.html', watchlist_athletes=watchlist_athletes)
+
+
+@app.route('/add_to_watchlist/<int:user_id>', methods=['POST'])
+@login_required
+def add_to_watchlist(user_id):
+
+    user = User.query.get(user_id)
+    if not user or user.usertype != 'Athlete':
+        flash('The athlete does not exist.', 'warning')
+        return redirect(url_for('view_athletes'))
+
+    athlete = user.profile.athlete_profile
+    if not athlete:
+        flash('The athlete profile does not exist.', 'warning')
+        return redirect(url_for('view_athletes'))
+
+    company = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+    if not company:
+        flash('Only companies can add to the watchlist.', 'warning')
+        return redirect(url_for('view_athletes'))
+
+    already_added = Watchlist.query.filter_by(companyid=company.companyprofileid, athleteid=athlete.athleteprofileid).first()
+    if already_added:
+        flash('This athlete is already in your watchlist.', 'info')
+        return redirect(url_for('view_athlete', user_id=user_id))
+
+    new_watchlist_item = Watchlist(companyid=company.companyprofileid, athleteid=athlete.athleteprofileid)
+    try:
+        db.session.add(new_watchlist_item)
+        db.session.commit()
+        flash('Athlete added to watchlist successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('An error occurred while adding the athlete to the watchlist.', 'danger')
+
+    return redirect(url_for('view_athlete', user_id=user_id))
+
+
+@app.route('/remove_from_watchlist/<int:athlete_id>', methods=['POST'])
+@login_required
+def remove_from_watchlist(athlete_id):
+
+    if current_user.usertype != 'Company':
+        flash('Only companies can remove athletes from watchlist!', 'danger')
+        return redirect(url_for('company_dashboard'))
+
+    company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+
+    if not company_profile:
+        flash('Company profile not found.', 'danger')
+        return redirect(url_for('company_dashboard'))
+
+    athlete_watchlist_entry = Watchlist.query.filter_by(companyid=company_profile.companyprofileid, athleteid=athlete_id).first()
+
+    if not athlete_watchlist_entry:
+        flash('Athlete not in your watchlist!', 'warning')
+        return redirect(url_for('company_dashboard'))
+
+    try:
+        db.session.delete(athlete_watchlist_entry)
+        db.session.commit()
+        flash('Successfully removed athlete from watchlist!', 'success')
+    except IntegrityError:
+        db.session.rollback()
+        flash('There was an error removing the athlete from the watchlist.', 'danger')
+    return redirect(url_for('company_dashboard'))
+
 @app.route('/view_athletes', methods=['GET', 'POST'])
 def view_athletes():
 
@@ -502,10 +582,15 @@ def view_athletes():
 
 
 @app.route('/athlete/<int:user_id>')
+@login_required
 def view_athlete(user_id):
 
     athlete = User.query.get_or_404(user_id)
-    return render_template('athlete_detail.html', athlete=athlete)
+    company_profile_id = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first().companyprofileid
+
+    is_in_watchlist = Watchlist.query.filter_by(athleteid=athlete.profile.athlete_profile.athleteprofileid, companyid=company_profile_id).first() is not None
+
+    return render_template('athlete_detail.html', athlete=athlete, is_in_watchlist=is_in_watchlist)
 
 @app.route('/admin/dashboard')
 @login_required

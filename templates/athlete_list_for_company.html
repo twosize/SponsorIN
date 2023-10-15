@@ -63,6 +63,7 @@
                 <td>{{ user.profile.athlete_profile.sportscategory if user.profile.athlete_profile else 'N/A' }}</td>
                 <td>
                     <a href="{{ url_for('view_athlete', user_id=user.userid) }}">View</a>
+
                 </td>
             </tr>
         {% endif %}

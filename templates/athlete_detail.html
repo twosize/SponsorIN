@@ -46,9 +46,13 @@
 
 <h3>Actions:</h3>
 
-
-
+{% if not is_in_watchlist %}
+<form method="POST" action="{{ url_for('add_to_watchlist', user_id=athlete.userid) }}">
+    <input type="submit" value="Add to Watchlist">
+</form>
+{% endif %}
 <a href="{{ url_for('view_athletes') }}">Back to Athlete List</a>
+<a href="{{ url_for('company_dashboard') }}">Back to Dashboard</a>
 
 </body>
 </html>
