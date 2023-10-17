@@ -32,7 +32,7 @@
                 {% if user.profile and user.profile.company_profile and user.profile.company_profile.companylogo %}
                     <img src="{{ url_for('static', filename=user.profile.company_profile.companylogo) }}" alt="Company Logo" width="30">
                 {% else %}
-                   <img src="{{ url_for('static', filename='profile_picture/default_logo.png') }}" alt="Default Logo" width="30">
+                   <img src="{{ url_for('static', filename='default_picture/default_company.png') }}" alt="Default Logo" width="30">
                 {% endif %}
             </td>
             <td>{{ user.userid }}</td>

@@ -25,17 +25,21 @@
     {% if company.companylogo %}
         <img src="{{ url_for('static', filename=company.companylogo) }}" alt="{{ company.companyname }} Logo">
     {% else %}
-        <p>No logo available.</p>
+         <img src="{{ url_for('static', filename='default_picture/default_company.png') }}" alt="Default Profile Picture">
     {% endif %}
 
-    <h2>Associated Profiles</h2>
-    <ul>
-        {% for profile in company.profile %}
-            <li>
-                <strong>Profile Name:</strong> {{ profile.fullname }}
-            </li>
-        {% endfor %}
-    </ul>
+    <h2>Associated Profile</h2>
+{% if company.profile %}
+    <strong>Profile Name:</strong> {{ company.profile.fullname }}<br>
+    {% if company.profile.bio %}
+        <strong>Bio:</strong> <p>{{ company.profile.bio }}</p>
+    {% else %}
+        <p>No bio provided.</p>
+    {% endif %}
+{% else %}
+    <p>No associated profile.</p>
+{% endif %}
+
 </div>
 
 <a href="{{ url_for('view_company') }}">Back to Companies List</a>

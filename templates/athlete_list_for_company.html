@@ -54,7 +54,7 @@
                     {% if user.profile.profilepicture %}
                         <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture" width="30">
                     {% else %}
-                        <img src="{{ url_for('static', filename='profile_picture/defaultpicture.png') }}" alt="Default Profile Picture" width="30">
+                        <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}" alt="Default Profile Picture" width="30">
                     {% endif %}
                 </td>
                 <td>{{ user.profile.fullname }}</td>

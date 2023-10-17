@@ -6,7 +6,7 @@ from sqlalchemy import and_
 from werkzeug.security import check_password_hash
 from PIL import Image
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Boolean, Enum, TIMESTAMP, create_engine
+from sqlalchemy import Column, or_,Integer, String, Text, ForeignKey, Boolean, Enum, TIMESTAMP, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from flask import jsonify
@@ -188,12 +188,25 @@ def signup():
 
     return render_template('signup.html')
 
-@app.route('/view_company')
+
+@app.route('/view_company', methods=['GET', 'POST'])
 @login_required
 def view_company():
-    companies = CompanyProfile.query.all()
-    return render_template('view_company.html', companies=companies)
+    if request.method == 'POST':
+        search_term = request.form.get('search', '').strip()
+        verified_companies = db.session.query(CompanyProfile) \
+            .join(Profile, CompanyProfile.profileid == Profile.profileid) \
+            .filter(Profile.verifiedstatus == True) \
+            .filter(
+            or_(CompanyProfile.companyname.ilike(f"%{search_term}%"), Profile.fullname.ilike(f"%{search_term}%"))) \
+            .all()
+    else:
+        verified_companies = db.session.query(CompanyProfile) \
+            .join(Profile, CompanyProfile.profileid == Profile.profileid) \
+            .filter(Profile.verifiedstatus == True) \
+            .all()
 
+    return render_template('view_company.html', companies=verified_companies)
 @app.route('/view_single_company/<int:company_id>')
 @login_required
 def view_single_company(company_id):
@@ -292,7 +305,8 @@ def create_profile():
         new_profile = Profile(
             userid=current_user.userid,
             fullname=full_name,
-            bio=bio
+            bio=bio,
+            profilepicture = 'profile_picture/defualtpicture.png'
         )
         db.session.add(new_profile)
         db.session.flush()
@@ -309,6 +323,7 @@ def create_profile():
                 gender=request.form.get('gender'),
                 sportscategory=request.form.get('sports_category'),
                 collegeid=college_id
+
             )
             db.session.add(athlete_profile)
 

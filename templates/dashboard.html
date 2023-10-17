@@ -57,7 +57,12 @@
   {% if profile and profile.profilepicture %}
    <img style="width:300px; height:auto;" src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture">
 {% else %}
-    <img src="{{ url_for('static', filename='default-profile-picture.png') }}" alt="Default Profile Picture">
+ {% if profile and profile.profilepicture %}
+        <img class="profile-picture" src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture">
+    {% else %}
+    <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}" alt="Default Profile Picture">
+    {% endif %}
+
 {% endif %}
 
 

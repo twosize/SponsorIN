@@ -9,8 +9,8 @@
             /* existing styles... */
         }
 
-        .profile-picture {
-            width: 100px; /* or any desired size */
+            .profile-picture {
+            width: 100px;
             height: auto;
             border-radius: 50%;
             margin-bottom: 20px;
@@ -31,7 +31,7 @@
     <h2>Admin Dashboard</h2>
 
 
-    <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}" alt="Default Profile Picture" >
+    <img class="profile-picture" src="{{ url_for('static', filename='default_picture/default-admin.jpg') }}" alt="Default Profile Picture" >
 
 
 

@@ -32,7 +32,7 @@
                         {% if company.companylogo %}
                             <img src="{{ url_for('static', filename=company.companylogo) }}" alt="Company Logo" width="30">
                         {% else %}
-                            <img src="{{ url_for('static', filename='company_logo/defaultlogo.png') }}" alt="Default Company Logo" width="30">
+                            <img src="{{ url_for('static', filename='default_picture/default_company.png') }}" alt="Default Company Logo" width="30">
                         {% endif %}
                     </td>
                     <td>{{ company.companyname }}</td>

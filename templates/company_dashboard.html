@@ -69,6 +69,8 @@
     <p><strong>Company Name:</strong> {{ company_profile.companyname }}</p>
     {% if company_profile.companylogo %}
     <img style="width:300px; height:auto;" src="{{ url_for('static', filename=company_profile.companylogo) }}" alt="Company Logo">
+    {% else %}
+    <img src="{{ url_for('static', filename='default_picture/default_company.png') }}" alt="Default Profile Picture">
     {% endif %}
     {% endif %}
 
