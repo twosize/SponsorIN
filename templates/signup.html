@@ -16,7 +16,7 @@
 <body class="d-flex align-items-center py-4 bg-body-tertiary">
     <main class="form-signup w-100 m-auto">
         <form method="post" action="{{ url_for('signup') }}">
-            <img src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}" alt="SponsorIn_Logo">
+            <div style="text-align: center;"><img src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}" alt="SponsorIn_Logo"></div>
             <h1 class="h3 mb-3 fw-normal">Please Signup</h1>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
