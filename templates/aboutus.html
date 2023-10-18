@@ -1,140 +1,190 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SponsorIn</title>
-    <style>
-        body, h1, p {
-            margin: 0;
-            padding: 0;
-        }
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://kit.fontawesome.com/yourcode.js"
+      crossorigin="anonymous"
+    ></script>
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f8f8;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        header {
-            background-color: #FFA500;
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-        }
-
-        header a {
-            color: #fff;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .logo {
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        .logo img {
-            max-width: 300px;
-            height: auto;
-        }
-
-        .container {
-            flex: 1;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 32px;
-            margin-bottom: 40px;
-            color: black;
-        }
-
-        p {
-            font-size: 18px;
-            line-height: 1.5;
-            margin-bottom: 40px;
-            text-align: justify;
-            color: #333;
-        }
-
-        .about-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            display: block;
-            margin: 40px auto;
-        }
-
-        .back-to-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #FFA500;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .back-to-top:hover {
-            background-color: #FFD700;
-        }
-
-        footer {
-            background-color: #f8f8f8;
-            color: #333;
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        footer p {
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-   <div class="logo">
-    <img src="{{ url_for('static', filename='images/SponsorIN_Logo.png') }}" alt="SponsorIn_Logo">
+    <title>Home</title>
+  </head>
+  <body class="">
+    <header
+      class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom m-2 p-2 bg-primary-subtle rounded"
+    >
+      <div class="col-md-3 mb-2 mb-md-0">
+        <a
+          href="/"
+          class="d-inline-flex link-body-emphasis text-decoration-none"
+        >
+          <img src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}" alt="SponsorIn_Logo" style="width: 300px; height: 150px;">
+        </a>
+      </div>
+    <div class="col-md-3 text-end">
+    {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('login') }}" class="btn btn-outline-primary me-2">Login</a>
+        <a href="{{ url_for('signup') }}" class="btn btn-primary">Sign-up</a>
+    {% else %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary me-2">Go to Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
+    {% endif %}
 </div>
-
-    <header>
-        <nav>
-            <a href="{{ url_for('index') }}">Home</a>
-            <a href="{{ url_for('about_us') }}">About Us</a>
-            <a href="contactus.html">Contact Us</a>
-            <a href="{{ url_for('signup') }}">Sign Up</a>
-            <a href="{{ url_for('login') }}">Log In</a>
-        </nav>
     </header>
 
-    <div class="container">
-        <h1>About Us</h1>
-        <img src="{{ url_for('static', filename='images/about-us.jpg') }}" alt="aboutus">
-        <p class="paragraph">
+    <div class="container col-xxl-8 px-4 py-5">
+      <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+        <div class="col-10 col-sm-8 col-lg-6">
+          <img
+            src="https://res.cloudinary.com/highereducation/images/f_auto,q_auto/v1659640107/BestColleges.com/What-Is-NIL-in-College-Sports-The-NCAA-Rules-Explained_392701c214/What-Is-NIL-in-College-Sports-The-NCAA-Rules-Explained_392701c214.jpg"
+            class="d-block mx-lg-auto img-fluid"
+            alt="NCAA"
+            width="700"
+            height="300"
+            loading="lazy"
+          />
+        </div>
+        <div class="col-lg-6">
+          <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">
+            Background Story
+          </h1>
+          <p class="lead">
             Before 2021, college athletes in the United States faced significant challenges when it came to securing financial support or finding sponsorships. The stringent NIL (Name, Image, and Likeness) restrictions imposed by the NCAA (National Collegiate Athletic Association) prevented them from benefiting financially from their talent and reputation. However, with recent changes in legislation across many states, college athletes now have the opportunity to receive compensation from their supporters and seek sponsorships to enhance their personal brands. Despite these positive legal developments, our research revealed a critical gap in the market. There was no dedicated platform to assist college athletes in promoting themselves and establishing valuable sponsorship connections. While well-funded companies could easily identify and sponsor talented athletes, the same opportunities were not readily available to individual athletes. This is where SponsorIn comes in.
-        </p>
-        <p class="paragraph">
+          </p>
+        </div>
+      </div>
+    </div>
+    <!---------------------------->
+
+    <div class="container col-xxl-8 px-4 py-5">
+      <div class="row flex-lg align-items-center g-5 py-5">
+        <div class="col-md-7 order-md-2">
+          <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">
+            What is SponsorIN?
+          </h1>
+          <p class="lead">
             We are a web application designed to empower college athletes and companies alike. SponsorIn serves as a connecting bridge, facilitating the collaboration between talented athletes and businesses looking to invest in their potential. Our platform creates an environment for athletes and companies to network, maintain meaningful connections, and foster mutually beneficial business relationships. With SponsorIn, college athletes gain the ability to proactively showcase their skills and seek sponsorship opportunities, leveling the playing field. Meanwhile, companies can identify athletes with outstanding potential and support them in growing their personal brands under a sponsorship arrangement. We are here to transform the landscape for college athletes, making it easier than ever for them to realize their full potential and secure the support they deserve.
-        </p>
+          </p>
+        </div>
+        <div class="col-md-5 order-md-1 rounded">
+          <img
+            src="https://sponsorshipcollective.com/wp-content/uploads/pexels-run-ffwpu-1555354-scaled.jpg"
+            class="d-block mx-lg-auto img-fluid"
+            alt="Bootstrap Themes"
+            width="500"
+            height="500"
+            loading="lazy"
+          />
+        </div>
+      </div>
     </div>
 
-    <button class="back-to-top" onclick="window.scrollTo(0, 0)">Back to Top</button>
+    <!------------------------------------------------------------------------------------------------------------------->
+    <div
+      class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3 justify-content-center"
+    >
+      <div
+        class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden rounded"
+        style="
+          background-image: url('https://cdn.taggbox.com/v7/taggbox.com/blog/wp-content/uploads/2018/07/Linkedin-feeds-web.jpg');
+          background-size: cover;
+        "
+      >
+        <div class="my-3 p-3 text-dark" style="position: relative; z-index: 1">
+          <h2 class="display-5 fw-bold">Great reviews</h2>
+          <p class="lead fw-bold">From both Athletes and Sponsors</p>
+        </div>
+        <div
+          class="bg-body shadow-sm mx-auto"
+          style="
+            width: 80%;
+            height: 300px;
+            border-radius: 21px 21px 0 0;
+            position: relative;
+            z-index: 1;
+          "
+        ></div>
+      </div>
+      <div
+        class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden rounded"
+        style="
+          background-image: url('https://media.licdn.com/dms/image/D5612AQFl7da9otyVzQ/article-cover_image-shrink_720_1280/0/1692171504314?e=2147483647&v=beta&t=8u2k5MHjB8yAZ86Je8s_55-fMQTLf0JJ0oHjjOMAZZs');
+          background-size: cover;
+        "
+      >
+        <div class="my-3 p-3 text-dark" style="position: relative; z-index: 1">
+          <h2 class="display-5 fw-bold">Many types of Sponsors</h2>
+          <p class="lead fw-bold">For many sports types, we have a variety of Companies</p>
+        </div>
+        <div
+          class="bg-body shadow-sm mx-auto"
+          style="
+            width: 80%;
+            height: 300px;
+            border-radius: 21px 21px 0 0;
+            position: relative;
+            z-index: 1;
+          "
+        ></div>
+      </div>
+    </div>
+    <!------------------------------------------------------------------------------------------------------------------->
+   <div class="container text-center">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 
-    <footer>
-        <p>Email: info@sponsorin.com</p>
-        <p>Phone: 336-336-3636</p>
-        <p>Address: 1400 Spring Garden Street Greensboro, NC 27412</p>
-    </footer>
-</body>
+    {% if not current_user.is_authenticated %}
+
+    {% else %}
+        {% if current_user.usertype == 'Admin' %}
+
+            <a href="{{ url_for('admin_dashboard') }}">Go to Admin Dashboard</a>
+        {% else %}
+
+            <a href="{{ url_for('dashboard') }}">Go to Dashboard</a>
+        {% endif %}
+
+        <a href="{{ url_for('logout') }}">Logout</a>
+    {% endif %}
+</div>
+    <div class="container">
+   <footer class="py-3 my-4">
+    <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+      <li class="nav-item">
+
+        <a href="/" class="nav-link px-2 text-body-secondary">Home</a>
+      </li>
+
+      <li class="nav-item">
+        <a href="/features" class="nav-link px-2 text-body-secondary">Features</a>
+      </li>
+      <li class="nav-item">
+        <a href="/faqs" class="nav-link px-2 text-body-secondary">FAQs</a>
+      </li>
+     <li class="nav-item">
+    <a href="{{ url_for('about_us') }}" class="nav-link px-2 text-body-secondary">About</a>
+</li>
+    </ul>
+     <p class="text-center text-body-secondary">Email: info@sponsorin.com</p>
+     <p class="text-center text-body-secondary">Phone: 336-336-3636</p>
+     <p class="text-center text-body-secondary">Address: 1400 Spring Garden Street Greensboro, NC 27412</p>
+     <p class="text-center text-body-secondary">© 2023 SponsorIN</p>
+
+  </footer>
+    </div>
+  </body>
 </html>
