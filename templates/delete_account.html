@@ -1,9 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <title>Delete Account</title>
+
+    <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+    crossorigin="anonymous"
+  />
+  <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='profile_picture/Pepsi-logo.png') }}"
+  />
+
+  <style>
+    .card-page {
+      height: 600px;
+      margin: 20px;
+      padding: 10px;
+      background-color: royalblue;
+      border-radius: 10px;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #loader {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .card-actions {
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
 </head>
+<body>
+    <div
+      class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5"
+      tabindex="-1"
+      role="dialog"
+      id="modalSignin"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header p-5 pb-4 border-bottom-0">
+            {% with messages = get_flashed_messages(with_categories=true) %} {%
+            if messages %} {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %} {% endif %} {% endwith %}
+          </div>
+
+          <div class="modal-body p-5 pt-0">
+            <form method="POST" action="{{ url_for('delete_account') }}">
+              <div class="form-floating mb-3">
+              <h1 class="h3 mb-3 fw-normal">Delete your account</h1>
+
+                <img
+                  class="h-100 w-100 rounded-5"
+                  src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}"
+                  alt="Default Profile Picture"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Enter password to conform account deletion</label>
+                <input
+                type="password"
+                class="form-control"
+                name="password"
+                required/> 
+                <input
+                class="form-control btn btn-outline-danger w-100 py-2 my-3 "
+                type="submit"
+                value="Yes, Delete My Account"
+              />
+            </div>
+            <hr class="my-4" />
+
+              <a href="{{ url_for('dashboard') }}" class="btn btn-outline-success w-100 py-2" >No, Take Me Back to My Dashboard</a>
+
+              
+            </form>
+          </div>
+          
+        </div>
+       
+      </div>
+    </div>
+  </body>
+  <!----
 <body>
     <h1>Are you sure you want to delete your account?</h1>
     <form method="POST" action="{{ url_for('delete_account') }}">
@@ -11,12 +100,8 @@
         <input type="password" name="password" required>
         <input type="submit" value="Yes, Delete My Account">
     </form>
-    <a href="{{ url_for('dashboard') }}">No, Take Me Back to My Dashboard</a>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary w-100 py-2" >No, Take Me Back to My Dashboard</a>
 </body>
+-->
 </html>
-
-
-
-
-
 

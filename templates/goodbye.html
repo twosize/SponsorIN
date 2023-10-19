@@ -1,22 +1,74 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Account Deleted</title>
-</head>
-<body>
-    <h1>Sorry to see you go!</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='profile_picture/Pepsi-logo.png') }}"
+    />
+  </head>
+  <body>
+    <div
+      class="modal modal-sheet d-block bg-body-secondary p-4 py-md-5"
+      tabindex="-1"
+      role="dialog"
+      id="modalSignin"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header p-5 pb-4 border-bottom-0">
+            {% with messages = get_flashed_messages(with_categories=true) %} {%
+            if messages %}
             <ul class="flashes">
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
+              {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+              {% endfor %}
             </ul>
-        {% endif %}
-    {% endwith %}
+            {% endif %} {% endwith %}
+          </div>
 
-    <a href="{{ url_for('index') }}">Return to homepage</a>
+          <div class="modal-body p-5 pt-0">
+            <form method="post" action="{{ url_for('login') }}">
+              <h1 class="h3 mb-3 fw-normal text-center">Sorry to see you go!</h1>
+
+              <div class="form-floating mb-3">
+                <img
+                  class="h-100 w-100 rounded-5"
+                  src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}"
+                  alt="Default Profile Picture"
+                />
+              </div>
+
+              <a href="{{ url_for('index') }}" 
+              class="btn btn-primary w-100 py-2">Return to homepage</a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+<!----
+    <h1>Sorry to see you go!</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <ul class="flashes">
+      {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %} {% endwith %}
+
+    <a href="{{ url_for('index') }}" 
+    class="btn btn-primary w-100 py-2">Return to homepage</a>
+-->
+
 </body>
-</html>
+  </html>

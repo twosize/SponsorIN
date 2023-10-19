@@ -1,75 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create Profile</title>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4/dist/css/select2.min.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/select2@4/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4/dist/js/select2.min.js"></script>
-    <style>
-        .select-container {
-            width: 80%; /* Adjust as necessary */
-        }
-        .select2 {
-            width: 80% !important;
-        }
-    </style>
-</head>
-<body>
-    <h1>Create Your Profile</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body class="bg-body-secondary">
+    <header
+      class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom m-2 p-2 bg-primary-subtle rounded"
+    >
+      <div class="col-md-3 mb-2 mb-md-0">
+        <a
+          href="/"
+          class="d-inline-flex link-body-emphasis text-decoration-none"
+        >
+          <h1>Athlete Dashboard</h1>
+        </a>
+      </div>
+      <div class="col-md-3 text-end">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary"
+          >Return to Dashboard</a
+        >
+        <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
+      </div>
+    </header>
+
+    <div
+      class="modal modal-sheet position-static d-block"
+      tabindex="-1"
+      role="dialog"
+      id="modalSignin"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header p-5 pb-4 border-bottom-0">
+            <h1 class="fw-bold mb-0 fs-2">Create Your Profile</h1>
+            {% with messages = get_flashed_messages(with_categories=true) %} {%
+            if messages %}
             <ul class="flashes">
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
+              {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+              {% endfor %}
             </ul>
-        {% endif %}
-    {% endwith %}
+            {% endif %} {% endwith %}
+          </div>
 
-    <form action="{{ url_for('create_profile') }}" method="post">
-        <label for="full_name">Full Name:</label>
-        <input type="text" name="full_name" required><br>
-        <label for="bio">Bio:</label>
-        <textarea name="bio" required></textarea><br>
+          <div class="modal-body p-5 pt-0">
+            <form
+              action="{{url_for('create_profile') }}"
+              method="post"
+              class=""
+            >
+              <div class="mb-3">
+                <label for="full_name" class="form-label">Full Name:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="full_name"
+                  required
+                />
+              </div>
 
-        {% if user_type == 'Athlete' %}
-            <label for="gender">Gender:</label>
-            <select name="gender">
+              <div class="mb-3">
+                <label for="bio" class="form-label">Bio:</label>
+                <textarea
+                  class="form-control"
+                  name="bio"
+                  required
+                  rows="3"
+                ></textarea>
+              </div>
+
+              {% if user_type == 'Athlete' %}
+              <label for="gender" class="form-label">Gender:</label>
+              <select name="gender" class="form-select">
+                <option value="option">Options</option>
                 <option value="Male">Male</option>
-                <option value="Female">Female</option>
-            </select><br>
+                <option value="Female">Female</option></select
+              ><br />
 
-            <label for="sports_category">Sports Category:</label>
-            <select name="sports_category">
+              <label for="sports_category" class="form-label"
+                >Sports Category:</label
+              >
+              <select name="sports_category" class="form-select">
                 <option value="Basketball">Basketball</option>
                 <option value="Football">Football</option>
                 <option value="Soccer">Soccer</option>
-            </select><br>
+                </select
+              ><br />
 
-            <div class="select-container">
-                <label for="college">College:</label>
-                <select name="college" id="college" required></select>
-            </div>
-            <script>
-                $(document).ready(function() {
-                    $('#college').select2({
-                        ajax: {
-                            url: '{{ url_for("get_colleges") }}',
-                            dataType: 'json'
-                        }
-                    });
+              <div class="select-container">
+                <label for="college" class="form-label">College:</label>
+                <select
+                  name="college"
+                  id="college"
+                  class="form-select"
+                ></select>
+              </div>
+
+              <script>
+                $(document).ready(function () {
+                  $("#college").select2({
+                    ajax: {
+                      url: '{{ url_for("get_colleges") }}',
+                      dataType: "json",
+                    },
+                  });
                 });
-            </script>
-        {% elif user_type == 'Company' %}
-            <label for="company_name">Company Name:</label>
-            <input type="text" name="company_name" required><br>
+              </script>
+              {% elif user_type == 'Company' %}
+              <label for="company_name" class="form-label">Company Name:</label>
+              <input type="text" name="company_name" class="form-control" required /><br />
 
+              {% endif %}
+              <button
+                class="btn btn-primary w-100 my-3"
+                type="submit"
+                value="Create Profile"
+              >
+                Create Profile
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!---------------------------------------------------------------------------->
 
-        {% endif %}
+    <!--
+    <h1>Create Your Profile</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <ul class="flashes">
+      {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %} {% endwith %}
 
-        <input type="submit" value="Create Profile">
+    <form action="{{ url_for('create_profile') }}" method="post">
+      <label for="full_name">Full Name:</label>
+      <input type="text" name="full_name" required /><br />
+      <label for="bio">Bio:</label>
+      <textarea name="bio" required></textarea><br />
+
+      {% if user_type == 'Athlete' %}
+      <label for="gender">Gender:</label>
+      <select name="gender">
+        <option value="Male">Male</option>
+        <option value="Female">Female</option></select
+      ><br />
+
+      <label for="sports_category">Sports Category:</label>
+      <select name="sports_category">
+        <option value="">Option</option>
+        <option value="Basketball">Basketball</option>
+        <option value="Football">Football</option></select
+      ><br />
+
+      <div class="select-container">
+        <label for="college">College:</label>
+        <select name="college" id="college" required></select>
+      </div>
+      <script>
+        $(document).ready(function () {
+          $("#college").select2({
+            ajax: {
+              url: '{{ url_for("get_colleges") }}',
+              dataType: "json",
+            },
+          });
+        });
+      </script>
+      {% elif user_type == 'Company' %}
+      <label for="company_name">Company Name:</label>
+      <input type="text" name="company_name" required /><br />
+
+      {% endif %}
+
+      <input type="submit" value="Create Profile" />
     </form>
+        -->
+    <!---------------------------------------------------------------------------->
+
+
 </body>
 </html>
+

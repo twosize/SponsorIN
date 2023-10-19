@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html data-bs-theme="dark">
-<head>
+  <head>
     <title>Signup</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -8,65 +8,130 @@
       integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous"
     />
-    <style>
-        .error { color: red; }
-        .info { color: blue; }
-    </style>
-</head>
-<body class="d-flex align-items-center py-4 bg-body-tertiary">
-    <main class="form-signup w-100 m-auto">
-        <form method="post" action="{{ url_for('signup') }}">
-            <div style="text-align: center;"><img src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}" alt="SponsorIn_Logo"></div>
-            <h1 class="h3 mb-3 fw-normal">Please Signup</h1>
+   
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='profile_picture/Pepsi-logo.png') }}"
+    />
+  </head>
+  <body>
+    <div
+      class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5"
+      tabindex="-1"
+      role="dialog"
+      id="modalSignin"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header p-5 pb-4 border-bottom-0">
+            {% with messages = get_flashed_messages(with_categories=true) %} {%
+            if messages %} {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %} {% endif %} {% endwith %}
+          </div>
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert {{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="username" name="username" placeholder="exampleUsername" required minlength="3" maxlength="15">
+          <div class="modal-body p-4 pt-0">
+            <form method="post" action="{{ url_for('signup') }}">
+              <div class="form-floating mb-3">
+                <img
+                  class="h-100 w-100 rounded-5"
+                  src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}"
+                  alt="Default Profile Picture"
+                />
+              </div>
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  name="username"
+                  placeholder="exampleUsername"
+                  required
+                  minlength="3"
+                  maxlength="15"
+                />
                 <label for="username">Username</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+              </div>
+              <div class="form-floating mb-3">
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  placeholder="name@example.com"
+                  required
+                />
                 <label for="email">Email</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required minlength="8">
+              </div>
+              <div class="form-floating mb-3">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  placeholder="Password"
+                  required
+                  minlength="8"
+                />
                 <label for="password">Password</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="Confirm Password" required minlength="8" oninput="validatePassword()">
+              </div>
+              <div class="form-floating mb-3">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password_confirm"
+                  name="password_confirm"
+                  placeholder="Confirm Password"
+                  required
+                  minlength="8"
+                  oninput="validatePassword()"
+                />
                 <label for="password_confirm">Confirm Password</label>
-            </div>
-            <label for="usertype" class="form-label">User Type:</label>
-            <select class="form-select mb-3" name="usertype" id="usertype">
+              </div>
+              <label for="usertype" class="form-label">User Type:</label>
+              <select class="form-select mb-3" name="usertype" id="usertype">
                 <option value="Athlete">Athlete</option>
                 <option value="Company">Company</option>
-            </select>
+              </select>
 
-            <button class="btn btn-primary w-100 py-2" type="submit">Sign Up</button>
-        </form>
-        <div class="container mt-3">
-            <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
-            <a href="{{ url_for('index') }}" class="home-button">Return to Home</a>
+              <button class="btn btn-primary w-100 py-2" type="submit">
+                Sign Up
+              </button>
+            </form>
+          </div>
+          <div class="text-center mb-2">
+            <p>
+              Already have an account?
+              <a href="{{ url_for('login') }}">Login</a>
+            </p>
+            <a href="{{ url_for('index') }}" class="home-button"
+              >Return to Home</a
+            >
+          </div>
         </div>
-    </main>
+      </div>
+    </div>
 
     <script>
-        function validatePassword() {
-            if(document.getElementById('password').value !== document.getElementById('password_confirm').value) {
-                document.getElementById('password_confirm').setCustomValidity('Passwords do not match.');
-            } else {
-                document.getElementById('password_confirm').setCustomValidity('');
-            }
+      function validatePassword() {
+        if (
+          document.getElementById("password").value !==
+          document.getElementById("password_confirm").value
+        ) {
+          document
+            .getElementById("password_confirm")
+            .setCustomValidity("Passwords do not match.");
+        } else {
+          document.getElementById("password_confirm").setCustomValidity("");
         }
+      }
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-</body>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>
+
