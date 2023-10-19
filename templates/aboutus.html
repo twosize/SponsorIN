@@ -87,54 +87,19 @@
     </div>
 
     <!------------------------------------------------------------------------------------------------------------------->
-    <div
-      class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3 justify-content-center"
+   <section
+      id="cta"
+      class="cta"
     >
-      <div
-        class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden rounded"
-        style="
-          background-image: url('https://cdn.taggbox.com/v7/taggbox.com/blog/wp-content/uploads/2018/07/Linkedin-feeds-web.jpg');
-          background-size: cover;
-        "
-      >
-        <div class="my-3 p-3 text-dark" style="position: relative; z-index: 1">
-          <h2 class="display-5 fw-bold">Great reviews</h2>
-          <p class="lead fw-bold">From both Athletes and Sponsors</p>
+      <div class="container">
+        <div class="text-center aos-init aos-animate text-bg-" data-aos="zoom-in">
+          <h3>Great reviews from Athletes and Sponsors</h3>
+          <p class="px-5">Don't just take our word for it. Our platform is backed by rave reviews from athletes and sponsors who have found success and fulfillment through SponsorIN. Their stories and endorsements serve as a testament to the trust and credibility we've established.
+            Join SponsorIN today and experience excellence and ease in connecting with the perfect sponsor or athlete. Your journey to success in the world of collegiate sports and beyond starts here, and we're here to make it exceptional.
+          </p>
         </div>
-        <div
-          class="bg-body shadow-sm mx-auto"
-          style="
-            width: 80%;
-            height: 300px;
-            border-radius: 21px 21px 0 0;
-            position: relative;
-            z-index: 1;
-          "
-        ></div>
       </div>
-      <div
-        class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden rounded"
-        style="
-          background-image: url('https://media.licdn.com/dms/image/D5612AQFl7da9otyVzQ/article-cover_image-shrink_720_1280/0/1692171504314?e=2147483647&v=beta&t=8u2k5MHjB8yAZ86Je8s_55-fMQTLf0JJ0oHjjOMAZZs');
-          background-size: cover;
-        "
-      >
-        <div class="my-3 p-3 text-dark" style="position: relative; z-index: 1">
-          <h2 class="display-5 fw-bold">Many types of Sponsors</h2>
-          <p class="lead fw-bold">For many sports types, we have a variety of Companies</p>
-        </div>
-        <div
-          class="bg-body shadow-sm mx-auto"
-          style="
-            width: 80%;
-            height: 300px;
-            border-radius: 21px 21px 0 0;
-            position: relative;
-            z-index: 1;
-          "
-        ></div>
-      </div>
-    </div>
+    </section>
     <!------------------------------------------------------------------------------------------------------------------->
    <div class="container text-center">
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -147,7 +112,7 @@
         {% endif %}
     {% endwith %}
 
-<<<<<<< Updated upstream
+
     {% if not current_user.is_authenticated %}
 
     {% else %}
@@ -189,13 +154,5 @@
     </div>
   </body>
 </html>
-=======
-    <footer>
-        <p>Email: info@sponsorin.com</p>
-        <p>Phone: 336-336-3636</p>
-        <p>Address: 1400 Spring Garden Street Greensboro, NC 27412</p>
-    </footer>
-</body>
-</html>
+
 <!----->
->>>>>>> Stashed changes
