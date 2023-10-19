@@ -21,6 +21,7 @@
         padding: 100px 0;
         height: 40vh;
       }
+
     </style>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='profile_picture/Pepsi-logo.png') }}">
     <title>Home</title>
@@ -37,6 +38,8 @@
           <img src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}" alt="SponsorIn_Logo" style="width: 300px; height: 150px;">
         </a>
       </div>
+
+
       <div class="col-md-3 text-end">
         {% if not current_user.is_authenticated %}
         <a href="{{ url_for('login') }}" class="btn btn-outline-primary me-2"
@@ -54,45 +57,12 @@
       </div>
     </header>
 
-    <div class="container col-xxl-8 px-4 py-5">
-      <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
-        <div class="col-10 col-sm-8 col-lg-6">
-          <img
-            src="https://images.unsplash.com/photo-1512291152593-07033c65b791?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1049&q=80"
-            class="d-block mx-lg-auto img-fluid"
-            alt="Bootstrap Themes"
-            width="700"
-            height="300"
-            loading="lazy"
-          />
-        </div>
-        <div class="col-lg-6">
-          <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">
-            SponsorIN - connecting Athletes and Sponsors
-          </h1>
-          <p class="lead">
-            Are you a college athlete looking to take your career to the next
-            level? Or perhaps you're a sponsor seeking to support and
-            collaborate with promising talents? SponsorIN is here to bridge the
-            gap and revolutionize the way athletes and sponsors connect in the
-            exciting era of Name, Image, and Likeness (NIL) opportunities
-          </p>
-          <div class="d-grid gap-2 d-md-flex justify-content-center">
-            <a
-              href="{{ url_for('about_us') }}"
-              class="btn btn-outline-primary btn-lg"
-              >About</a
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-    <!---------------------------->
+    <!------------------------------------------------------------------------------------------------------------------->
 
-    <!---------------------------->
-    <div class="container px-4 py-5">
-      <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
+     <div class="container px-4 py-1">
+      <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-1">
         <div class="col d-flex flex-column align-items-start gap-2">
+            <img src="https://drmichellecleere.com/wp-content/uploads/2016/07/dr-michelle-winning.jpg" alt="Image" class="img-fluid" style="width: 100%; max-width: 100%; height: auto; display: block; margin-bottom: 10px;">
           <h2 class="fw-bold text-body-emphasis">Features we offer</h2>
           <p class="text-body-secondary">
             Ranking system for Athletes. Get noticed for your skills and
@@ -113,6 +83,7 @@
                   <use xlink:href=""></use>
                 </svg>
               </div>
+                <img src="https://t3.ftcdn.net/jpg/03/89/32/80/360_F_389328016_ak3iUrk15slWfEZdYL96O6eKTUyImDeC.jpg" alt="Image" class="img-fluid" style="width: 100%; max-width: 100%; height: auto; display: block; margin-bottom: 10px;">
               <h4 class="fw-semibold mb-0 text-body-emphasis">
                 Social Media Integration
               </h4>
@@ -130,6 +101,7 @@
                   <use xlink:href="#gear-fill"></use>
                 </svg>
               </div>
+                 <img src="https://images.ctfassets.net/wt70guc1rpin/wp-media-78606/306da3fa75e1733de97396bc140c98c9/CAP-US-Header-How-to-send-a-direct-message-on-instagram-880x440-notext-DLVR.png" alt="Image 2" class="img-fluid" style="width: 100%; max-width: 100%; height: auto; display: block; margin-bottom: 10px;">
               <h4 class="fw-semibold mb-0 text-body-emphasis">
                 Direct Messaging
               </h4>
@@ -148,6 +120,7 @@
                   <use xlink:href="#speedometer"></use>
                 </svg>
               </div>
+                <img src="https://buffer.com/library/content/images/library/wp-content/uploads/2017/03/customize-my-facebook-news-feed-featured-image.png" alt="Image 3" class="img-fluid" style="width: 100%; max-width: 100%; height: auto; display: block; margin-bottom: 10px;">
               <h4 class="fw-semibold mb-0 text-body-emphasis">News Feed</h4>
               <p class="text-body-secondary">
                 Stay informed and ahead of the game with our news feed. Whether
@@ -165,6 +138,7 @@
                   <use xlink:href="#table"></use>
                 </svg>
               </div>
+                <img src="https://hbr.org/resources/images/article_assets/2020/03/Mar20_12_115049941.jpg" alt="Image 4" class="img-fluid" style="width: 100%; max-width: 100%; height: auto; display: block; margin-bottom: 10px;">
               <h4 class="fw-semibold mb-0 text-body-emphasis">
                 Exclusive Job Opportunities
               </h4>
@@ -179,77 +153,6 @@
         </div>
       </div>
     </div>
-
-    <div class="container col-xxl-8 px-4 py-5">
-      <div class="row flex-lg align-items-center g-5 py-5">
-        <div class="col-md-7 order-md-2">
-          <h2 class="featurette-heading fw-normal lh-1">
-            NIL Compliance
-            <span class="text-body-secondary">Based on you</span>
-          </h2>
-          <p class="lead">
-            NIL compliance, which stands for "Name, Image, and Likeness," refers
-            to a set of rules and regulations that govern how college athletes
-            can benefit from their own names, images, and likenesses while
-            maintaining their eligibility to compete in collegiate sports. Prior
-            to NIL changes, NCAA (National Collegiate Athletic Association)
-            rules strictly prohibited college athletes from profiting from their
-            own NIL rights.
-          </p>
-        </div>
-        <div class="col-md-5 order-md-1 rounded">
-          <img
-            src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80"
-            class="d-block mx-lg-auto img-fluid"
-            alt="Bootstrap Themes"
-            width="500"
-            height="500"
-            loading="lazy"
-          />
-        </div>
-      </div>
-    </div>
-
-
-    
-    <!----------------------------------------------------------------------------------------------------->
-
-    <div class="container col-xxl-8 px-4 py-5">
-      <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
-        <div class="col-lg-6">
-          <div class="card w-75">
-            <img
-              class="card-img-top"
-              src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&w=1886"
-              alt="Card image"
-              style="width: 100%"
-            />
-            <div class="card-body">
-              <h4 class="card-title">David Russo</h4>
-              <p class="card-text">
-                Place forward for Soccer team. Scholarship to study at UNCG.
-                Studying Computer Science minor in Economics
-              </p>
-              <a href="#" class="btn btn-primary">See Profile</a>
-            </div>
-          </div>
-          <br />
-        </div>
-        <div class="col-lg-6">
-          <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">
-            Customize your profile
-          </h1>
-          <p class="lead">
-            Profile Photo lets you upload your person profile picture. You can
-            write a brief bio that highlights your achievements, goals, and what
-            makes you unique. Include links to your social media profiles (e.g.,
-            Twitter, Instagram) to provide sponsors with a deeper look into your
-            personal brand.
-          </p>
-        </div>
-      </div>
-    </div>
-    <!------------------------------------------------------------------------------------------------------------------->
 
     <section
       id="cta"
@@ -294,14 +197,12 @@
 
 
           <li class="nav-item">
-            <a href="{{ url_for('features') }}"
-               class="nav-link px-2 text-body-secondary"
+            <a href="/features" class="nav-link px-2 text-body-secondary"
               >Features</a
             >
           </li>
           <li class="nav-item">
-            <a href="{{ url_for('faqs') }}"
-               class="nav-link px-2 text-body-secondary">FAQs</a>
+            <a href="/faqs" class="nav-link px-2 text-body-secondary">FAQs</a>
           </li>
           <li class="nav-item">
             <a

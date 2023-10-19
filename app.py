@@ -16,7 +16,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisshouldbesecret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://brandontiong:BT2129bt@localhost:5432/sponsorin'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://egekeser:1954@localhost:5432/sponsorin'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -838,6 +838,14 @@ def admin_edit(user_id):
 @app.route('/aboutus')
 def about_us():
     return render_template('aboutus.html')
+
+@app.route('/faqs')
+def faqs():
+    return render_template('faqs.html')
+
+@app.route('/features')
+def features():
+    return render_template('features.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
