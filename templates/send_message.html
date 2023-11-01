@@ -1,17 +1,17 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Send Message</title>
 </head>
 <body>
-    <h2>Send Message to Admin</h2>
-    <form method="POST" action="{{ url_for('send_message', admin_id=admin_id) }}">
-        <label for="message">Your Message:</label><br>
-        <textarea name="message" id="message" rows="4" required></textarea><br>
+    <h1>Send Message to {{ receiver.username }}</h1>
+    <form method="POST" action="{{ url_for('send_message', receiver_id=receiver.userid) }}">
+        <textarea name="content" rows="4" placeholder="Type your message here..."></textarea><br>
         <input type="submit" value="Send Message">
     </form>
+    <a href="{{ url_for('go_back') }}">Back</a>
 </body>
 </html>

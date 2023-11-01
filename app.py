@@ -10,6 +10,7 @@ from sqlalchemy import Column, or_,Integer, String, Text, ForeignKey, Boolean, E
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from flask import jsonify
+from sqlalchemy.orm import aliased
 from sqlalchemy.orm import joinedload
 import os
 
@@ -90,6 +91,7 @@ class Offer(db.Model):
     athleteid = db.Column(db.Integer, ForeignKey('athleteprofile.athleteprofileid'))
     details = db.Column(db.Text)
     status = db.Column(Enum('Pending', 'Accepted', 'Declined', 'Counter-offered', name='offerstatus'), default='Pending')
+    last_updated_by = db.Column(Enum('Company', 'Athlete', name='updatedbytype'), nullable=True)
 
 class Watchlist(db.Model):
     __tablename__ = 'watchlist'
@@ -97,6 +99,15 @@ class Watchlist(db.Model):
     companyid = db.Column(db.Integer, ForeignKey('companyprofile.companyprofileid'))
     athleteid = db.Column(db.Integer, ForeignKey('athleteprofile.athleteprofileid'))
     sportscategory = db.Column(Enum('Basketball', 'Football', 'Soccer', name='sportscategorytype'))
+
+class Sponsorship(db.Model):
+    __tablename__ = 'sponsorship'
+    sponsorshipid = db.Column(db.Integer, primary_key=True)
+    companyid = db.Column(db.Integer, ForeignKey('companyprofile.companyprofileid'))
+    athleteid = db.Column(db.Integer, ForeignKey('athleteprofile.athleteprofileid'))
+    startdate = db.Column(db.TIMESTAMP, default=db.func.current_timestamp())
+    enddate = db.Column(db.TIMESTAMP)
+    details = db.Column(db.Text)
 
 
 @app.route('/', methods=['GET'])
@@ -189,105 +200,46 @@ def signup():
     return render_template('signup.html')
 
 
+from sqlalchemy.orm import aliased
+
 @app.route('/view_company', methods=['GET', 'POST'])
 @login_required
 def view_company():
     if request.method == 'POST':
         search_term = request.form.get('search', '').strip()
-        verified_companies = db.session.query(CompanyProfile) \
+        verified_companies = db.session.query(CompanyProfile, Profile.userid) \
             .join(Profile, CompanyProfile.profileid == Profile.profileid) \
             .filter(Profile.verifiedstatus == True) \
             .filter(
             or_(CompanyProfile.companyname.ilike(f"%{search_term}%"), Profile.fullname.ilike(f"%{search_term}%"))) \
             .all()
     else:
-        verified_companies = db.session.query(CompanyProfile) \
+        verified_companies = db.session.query(CompanyProfile, Profile.userid) \
             .join(Profile, CompanyProfile.profileid == Profile.profileid) \
             .filter(Profile.verifiedstatus == True) \
             .all()
 
     return render_template('view_company.html', companies=verified_companies)
+
 @app.route('/view_single_company/<int:company_id>')
 @login_required
 def view_single_company(company_id):
     company = CompanyProfile.query.get_or_404(company_id)
-    return render_template('company_detail.html', company=company)
+    sponsored_athletes = []
+
+    sponsorships = Sponsorship.query.filter_by(companyid=company.companyprofileid).all()
+    for sponsorship in sponsorships:
+        athlete_profile = AthleteProfile.query.get(sponsorship.athleteid)
+        if athlete_profile:
+            sponsored_athletes.append(Profile.query.get(athlete_profile.profileid))
+
+    return render_template('company_detail.html', company=company, sponsored_athletes=sponsored_athletes)
 
 @app.route('/contact_support')
 @login_required
 def contact_support():
     admin_users = User.query.filter_by(usertype='Admin').all()
     return render_template('contact_support.html', users=admin_users)
-
-
-@app.route('/send_message/<int:admin_id>', methods=['GET', 'POST'])
-@login_required
-def send_message(admin_id):
-
-    admin_user = User.query.get(admin_id)
-    if not admin_user or admin_user.usertype != 'Admin':
-        flash('Admin user not found!', 'error')
-        return redirect(url_for('dashboard'))
-
-    if request.method == 'POST':
-        message_content = request.form.get('message')
-        if not message_content:
-            flash('Message cannot be empty!', 'error')
-            return render_template('send_message.html', admin_id=admin_id)
-
-        flash('Your message has been sent!', 'success')
-        return redirect(url_for('dashboard'))
-
-    return render_template('send_message.html', admin_id=admin_id)
-
-
-
-
-@app.route('/offer/accept/<int:offer_id>', methods=['POST'])
-@login_required
-def accept_offer(offer_id):
-    offer = Offer.query.get(offer_id)
-    if offer and offer.athleteid == current_user.id:
-        offer.status = 'Accepted'
-        db.session.commit()
-        flash('Offer accepted successfully', 'success')
-    else:
-        flash('Offer not found or unauthorized action', 'error')
-    return redirect(url_for('view_offers'))
-
-@app.route('/offer/decline/<int:offer_id>', methods=['POST'])
-@login_required
-def decline_offer(offer_id):
-    offer = Offer.query.get(offer_id)
-    if offer and offer.athleteid == current_user.id:
-        offer.status = 'Declined'
-        db.session.commit()
-        flash('Offer declined successfully', 'success')
-    else:
-        flash('Offer not found or unauthorized action', 'error')
-    return redirect(url_for('view_offers'))
-
-@app.route('/offer/counter/<int:offer_id>', methods=['POST'])
-@login_required
-def counter_offer(offer_id):
-    offer = Offer.query.get(offer_id)
-    if offer and offer.athleteid == current_user.id:
-
-        counter_details = request.form.get('counter_details')
-        offer.status = 'Counter-offered'
-        offer.details = counter_details
-        db.session.commit()
-        flash('Offer countered successfully', 'success')
-    else:
-        flash('Offer not found or unauthorized action', 'error')
-    return redirect(url_for('view_offers'))
-
-
-@app.route('/view_offers')
-@login_required
-def view_offers():
-    offers = Offer.query.filter_by(athleteid=current_user.userid, status='Pending').all()
-    return render_template('viewoffers.html', offers=offers)
 
 
 @app.route('/create_profile', methods=['GET', 'POST'])
@@ -599,13 +551,25 @@ def view_athletes():
 @app.route('/athlete/<int:user_id>')
 @login_required
 def view_athlete(user_id):
-
     athlete = User.query.get_or_404(user_id)
-    company_profile_id = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first().companyprofileid
+    company_profile_id = CompanyProfile.query.filter_by(
+        profileid=current_user.profile.profileid).first().companyprofileid
 
-    is_in_watchlist = Watchlist.query.filter_by(athleteid=athlete.profile.athlete_profile.athleteprofileid, companyid=company_profile_id).first() is not None
+    is_in_watchlist = Watchlist.query.filter_by(athleteid=athlete.profile.athlete_profile.athleteprofileid,
+                                                companyid=company_profile_id).first() is not None
 
-    return render_template('athlete_detail.html', athlete=athlete, is_in_watchlist=is_in_watchlist)
+    sponsorship = Sponsorship.query.filter_by(athleteid=athlete.profile.athlete_profile.athleteprofileid,
+                                              companyid=company_profile_id).first()
+    if sponsorship:
+        sponsored = True
+        sponsor_company = CompanyProfile.query.get(company_profile_id)
+    else:
+        sponsored = False
+        sponsor_company = None
+
+    return render_template('athlete_detail.html', athlete=athlete, is_in_watchlist=is_in_watchlist, sponsored=sponsored,
+                           sponsor_company=sponsor_company)
+
 
 @app.route('/admin/dashboard')
 @login_required
@@ -775,14 +739,10 @@ def admin_user_list_page():
     if search:
         filter_conditions.append(User.username.ilike(f"%{search}%"))
 
-
-
-
-    admin_users = User.query.filter(User.usertype == 'Admin')
-
-    users = admin_users\
-                .join(Profile, User.userid == Profile.userid, isouter=True)\
-                .filter(*filter_conditions).all()
+    admin_users = User.query.filter(User.usertype == 'Admin', User.userid != current_user.userid)
+    users = admin_users \
+        .join(Profile, User.userid == Profile.userid, isouter=True) \
+        .filter(*filter_conditions).all()
 
     return render_template('admin_user_list.html', users=users)
 
@@ -832,6 +792,305 @@ def admin_edit(user_id):
         return redirect(url_for('admin_dashboard'))
 
     return render_template('admin_edit.html', user=user)
+
+
+@app.route('/send_message/<int:receiver_id>', methods=['GET', 'POST'])
+@login_required
+def send_message(receiver_id):
+    try:
+        receiver = User.query.filter_by(userid=receiver_id).one()
+    except "NoResultFound":
+        flash("User not found.", "danger")
+        return redirect_to_dashboard()
+
+    if request.method == 'POST':
+        content = request.form.get('content').strip()
+        if content:
+            new_message = Message(senderid=current_user.userid, receiverid=receiver.userid, content=content)
+            db.session.add(new_message)
+            db.session.commit()
+            flash('Message sent successfully!', 'success')
+            return redirect_to_dashboard()
+        else:
+            flash('Message cannot be empty!', 'danger')
+
+    return render_template('send_message.html', receiver=receiver, user_type=current_user.usertype)
+
+def redirect_to_dashboard():
+    if current_user.usertype == 'Admin':
+        return redirect(url_for('admin_dashboard'))
+    elif current_user.usertype == 'Company':
+        return redirect(url_for('company_dashboard'))
+    elif current_user.usertype == 'Athlete':
+        return redirect(url_for('dashboard'))
+    else:
+        flash('Unknown user type', 'danger')
+        return redirect(url_for('index'))
+@app.route('/get_messages')
+@login_required
+def get_messages():
+    user_id = current_user.userid
+    messages = Message.query.filter_by(receiverid=user_id).all()
+    return jsonify([{'subject': message.subject, 'body': message.body} for message in messages])
+
+@app.route('/view_messages', methods=['GET'])
+@login_required
+def view_messages():
+    current_user_id = current_user.get_id()
+
+    search_query = request.args.get('search', '').strip()
+    user_type_filter = request.args.get('user_type', '').capitalize()
+
+    sent_messages = db.session.query(Message.receiverid).filter_by(senderid=current_user_id).subquery()
+    received_messages = db.session.query(Message.senderid).filter_by(receiverid=current_user_id).subquery()
+
+    users_query = User.query.filter(
+        (User.userid.in_(sent_messages) | User.userid.in_(received_messages)) &
+        (User.userid != current_user_id)
+    )
+
+    if search_query:
+        users_query = users_query.filter(User.username.ilike(f'%{search_query}%'))
+
+    if user_type_filter:
+        users_query = users_query.filter(User.usertype == user_type_filter)
+
+    users = users_query.distinct().all()
+
+    return render_template('view_messages.html', users=users, search_query=search_query, user_type_filter=user_type_filter)
+@app.route('/view_conversation/<int:other_user_id>')
+@login_required
+def view_conversation(other_user_id):
+    current_user_id = current_user.get_id()
+    other_user = User.query.get_or_404(other_user_id)
+
+
+    sender = aliased(User)
+    receiver = aliased(User)
+
+    messages = db.session.query(
+        Message,
+        sender.username.label('sender_username'),
+        receiver.username.label('receiver_username')
+    ).join(sender, sender.userid == Message.senderid)\
+     .join(receiver, receiver.userid == Message.receiverid)\
+     .filter(
+        ((Message.senderid == current_user_id) & (Message.receiverid == other_user_id)) |
+        ((Message.senderid == other_user_id) & (Message.receiverid == current_user_id))
+    ).order_by(Message.timestamp).all()
+
+    return render_template('view_conversation.html', other_user=other_user, messages=messages)
+
+def delete_conversation(current_user_id, other_user_id):
+    Message.query.filter_by(senderid=current_user_id, receiverid=other_user_id).delete()
+    Message.query.filter_by(senderid=other_user_id, receiverid=current_user_id).delete()
+    db.session.commit()
+
+@app.route('/delete_conversation/<int:other_user_id>', methods=['POST'])
+@login_required
+def delete_conversation_route(other_user_id):
+    delete_conversation(current_user.userid, other_user_id)
+    flash('Conversation deleted successfully!', 'success')
+    return redirect(url_for('view_messages'))
+@app.route('/go_back')
+@login_required
+def go_back():
+    if current_user.usertype == 'Admin':
+        return redirect(url_for('admin_dashboard'))
+    elif current_user.usertype == 'Athlete':
+        return redirect(url_for('dashboard'))
+    elif current_user.usertype == 'Company':
+        return redirect(url_for('company_dashboard'))
+    flash('Unknown user type', 'error')
+    return redirect(url_for('index'))
+
+
+@app.route('/view_offers')
+@login_required
+def view_offers():
+    athlete_profile = AthleteProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+    if not athlete_profile:
+        flash('Athlete profile not found!', 'error')
+        return redirect(url_for('dashboard'))
+
+    pending_offers = Offer.query.filter_by(athleteid=athlete_profile.athleteprofileid, status='Pending').all()
+    return render_template('view_offers.html', offers=pending_offers, title='Pending Offers')
+
+@app.route('/view_offer_history')
+@login_required
+def view_offer_history():
+    athlete_profile = AthleteProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+    if not athlete_profile:
+        flash('Athlete profile not found!', 'error')
+        return redirect(url_for('dashboard'))
+
+    non_pending_offers = Offer.query.filter(
+        Offer.athleteid == athlete_profile.athleteprofileid,
+        Offer.status != 'Pending'
+    ).all()
+    return render_template('view_offer_history.html', offers=non_pending_offers)
+
+@app.route('/accept_offer/<int:offer_id>', methods=['POST'])
+@login_required
+def accept_offer(offer_id):
+    offer = Offer.query.get(offer_id)
+    athlete_profile = AthleteProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+
+    if offer and offer.athleteid == athlete_profile.athleteprofileid:
+        offer.status = 'Accepted'
+
+        sponsorship = Sponsorship(companyid=offer.companyid, athleteid=offer.athleteid,
+                                  details="Details of the sponsorship")
+        db.session.add(sponsorship)
+
+        db.session.commit()
+        flash('Offer accepted successfully!', 'success')
+    else:
+        flash('Offer not found or unauthorized action', 'error')
+    return redirect(url_for('view_offers'))
+
+
+
+@app.route('/decline_offer/<int:offer_id>', methods=['POST'])
+@login_required
+def decline_offer(offer_id):
+    offer = Offer.query.get(offer_id)
+    athlete_profile = AthleteProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+
+    if offer and offer.athleteid == athlete_profile.athleteprofileid:
+        offer.status = 'Declined'
+        db.session.commit()
+        flash('Offer declined successfully!', 'success')
+    else:
+        flash('Offer not found or unauthorized action', 'error')
+    return redirect(url_for('view_offers'))
+
+
+@app.route('/counter_offer/<int:offer_id>', methods=['POST'])
+@login_required
+def counter_offer(offer_id):
+    offer = Offer.query.get(offer_id)
+    athlete_profile = AthleteProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+    counter_details = request.form.get('counter_details')
+
+    if offer and offer.athleteid == athlete_profile.athleteprofileid:
+        offer.status = 'Counter-offered'
+        offer.details = counter_details
+        db.session.commit()
+        flash('Offer countered successfully!', 'success')
+    else:
+        flash('Offer not found or unauthorized action', 'error')
+    return redirect(url_for('view_offers'))
+
+
+@app.route('/company_offers')
+@login_required
+def company_offers():
+    company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+    if not company_profile:
+        flash('Company profile not found!', 'error')
+        return redirect(url_for('dashboard'))
+
+    offers = Offer.query.filter_by(companyid=company_profile.companyprofileid, status='Pending').all()
+    return render_template('company_offers.html', offers=offers)
+@app.route('/company_offer_history')
+@login_required
+def company_offer_history():
+    company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+    if not company_profile:
+        flash('Company profile not found!', 'error')
+        return redirect(url_for('dashboard'))
+
+    non_pending_offers = Offer.query.filter(
+        Offer.companyid == company_profile.companyprofileid,
+        Offer.status != 'Pending'
+    ).all()
+    return render_template('company_offer_history.html', offers=non_pending_offers)
+
+@app.route('/company_offers/send/<int:athlete_id>', methods=['GET', 'POST'])
+@login_required
+def send_offer(athlete_id):
+    if request.method == 'POST':
+        details = request.form.get('details')
+        company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+        new_offer = Offer(companyid=company_profile.companyprofileid, athleteid=athlete_id, details=details, last_updated_by='Company')
+        db.session.add(new_offer)
+        db.session.commit()
+        flash('Offer sent successfully!', 'success')
+        return redirect(url_for('company_offers'))
+    return render_template('company_send_offer.html')
+
+
+@app.route('/company_offers/respond/<int:offer_id>', methods=['GET', 'POST'])
+@login_required
+def respond_offer(offer_id):
+    offer = Offer.query.get_or_404(offer_id)
+    athlete_profile = AthleteProfile.query.get(offer.athleteid)
+    profile = Profile.query.get(athlete_profile.profileid) if athlete_profile else None
+
+
+    if offer.status not in ['Counter-offered', 'Pending']:
+        print("Redirecting because of offer status")
+        flash('This offer cannot be responded to.', 'error')
+        return redirect(url_for('company_offers'))
+
+    if offer.status == 'Pending' and offer.last_updated_by == 'Company':
+        print("Redirecting because last updated by company on a pending offer")
+        flash('Waiting for the athlete to respond.', 'info')
+        return redirect(url_for('company_offers'))
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'accept':
+            offer.status = 'Accepted'
+        elif action == 'decline':
+            offer.status = 'Declined'
+        elif action == 'counter':
+            details = request.form.get('details')
+            if details:  # Ensure details are provided for a counter offer
+                offer.details = details
+                offer.status = 'Counter-offered'
+                offer.last_updated_by = 'Company'
+            else:
+                flash('Please provide details for the counter offer.', 'error')
+                return render_template('company_respond_offer.html', offer=offer, profile=profile)
+        db.session.commit()
+        flash('Response sent successfully!', 'success')
+        return redirect(url_for('company_offers'))
+
+    return render_template('company_respond_offer.html', offer=offer, profile=profile)
+
+
+
+@app.route('/view_sponsorees')
+@login_required
+def view_sponsorees():
+    company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+    if not company_profile:
+        flash('Company profile not found!', 'error')
+        return redirect(url_for('dashboard'))
+
+    sponsorees = Sponsorship.query.filter_by(companyid=company_profile.companyprofileid).all()
+    sponsoree_profiles = []
+    for sponsoree in sponsorees:
+        athlete_profile = AthleteProfile.query.get(sponsoree.athleteid)
+        profile = Profile.query.get(athlete_profile.profileid)
+        sponsoree_profiles.append(profile)
+
+    return render_template('view_sponsorees.html', sponsoree_profiles=sponsoree_profiles)
+
+
+
+@app.route('/athlete/sponsors')
+@login_required
+def view_sponsors():
+    athlete_profile = AthleteProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+    if not athlete_profile:
+        flash('Athlete profile not found.', 'danger')
+        return redirect(url_for('dashboard'))  # Redirect to a dashboard or another appropriate page
+
+    sponsorships = Sponsorship.query.filter_by(athleteid=athlete_profile.athleteprofileid).all()
+    sponsors = [CompanyProfile.query.get(sponsorship.companyid) for sponsorship in sponsorships]
+    return render_template('view_sponsors.html', sponsors=sponsors)
 
 
 

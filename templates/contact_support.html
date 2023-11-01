@@ -48,7 +48,7 @@
        </div>
      </header>
      <!---------------------------------------------------------------------------->
-     
+
 
     <table border="1">
         <tr>
@@ -68,7 +68,8 @@
                 </td>
                 <td>{{ user.username }}</td>
                 <td>
-                    <a href="{{ url_for('send_message', admin_id=user.userid) }}">Contact</a>
+                    <a href="{{ url_for('send_message', receiver_id=user.userid) }}">Contact</a>
+
                 </td>
             </tr>
             {% endif %}

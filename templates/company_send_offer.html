@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Offer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Send Offer to Athlete</h1>
+    <form method="POST">
+        <label for="details">Offer Details:</label>
+        <textarea id="details" name="details" required></textarea>
+        <button type="submit">Send Offer</button>
+    </form>
+    <a href="{{ url_for('company_offers') }}">Back to Offers</a>
+</body>
+</html>

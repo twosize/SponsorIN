@@ -15,6 +15,11 @@
             border: 1px solid #e0e0e0;
             margin-bottom: 20px;
         }
+        .sponsored-athletes {
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -29,17 +34,33 @@
     {% endif %}
 
     <h2>Associated Profile</h2>
-{% if company.profile %}
-    <strong>Profile Name:</strong> {{ company.profile.fullname }}<br>
-    {% if company.profile.bio %}
-        <strong>Bio:</strong> <p>{{ company.profile.bio }}</p>
+    {% if company.profile %}
+        <strong>Profile Name:</strong> {{ company.profile.fullname }}<br>
+        {% if company.profile.bio %}
+            <strong>Bio:</strong> <p>{{ company.profile.bio }}</p>
+        {% else %}
+            <p>No bio provided.</p>
+        {% endif %}
     {% else %}
-        <p>No bio provided.</p>
+        <p>No associated profile.</p>
     {% endif %}
-{% else %}
-    <p>No associated profile.</p>
-{% endif %}
 
+    {% if company.profile and current_user.is_authenticated %}
+            <a href="{{ url_for('send_message', receiver_id=company.profile.userid) }}" class="btn">Send Message</a>
+    {% endif %}
+</div>
+
+<div class="sponsored-athletes">
+    <h2>Sponsored Athletes</h2>
+    {% if sponsored_athletes %}
+        <ul>
+            {% for athlete in sponsored_athletes %}
+                <li>{{ athlete.fullname }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>This company is not sponsoring any athletes.</p>
+    {% endif %}
 </div>
 
 <a href="{{ url_for('view_company') }}">Back to Companies List</a>

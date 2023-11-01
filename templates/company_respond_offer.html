@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Respond to Offer</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .alert {
+            padding: 10px;
+            border: 1px solid #f8d7da;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Respond to Offer</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-{{ messages[0][0] }}">
+                    {{ messages[0][1] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="card">
+<p><strong>Athlete Name:</strong> {{ profile.fullname if profile else 'Unknown' }}</p>
+            <p><strong>Offer Content:</strong> {{ offer.details }}</p>
+            <p><strong>Status:</strong> {{ offer.status }}</p>
+            <form method="post" action="{{ url_for('respond_offer', offer_id=offer.offerid) }}">
+    <div class="form-group">
+        <label for="details">Your Response</label>
+        <textarea id="details" name="details" rows="3" required></textarea>
+    </div>
+    <button type="submit" name="action" value="accept">Accept Offer</button>
+    <button type="submit" name="action" value="decline">Decline Offer</button>
+    <button type="submit" name="action" value="counter">Counter Offer</button>
+</form>
+
+        </div>
+
+        <a href="{{ url_for('company_offers') }}">Back to Offers</a>
+    </div>
+</body>
+</html>

@@ -16,6 +16,27 @@
       href="{{ url_for('static', filename='profile_picture/Pepsi-logo.png') }}"
     />
 
+    <style>
+      .card-page {
+        height: 900px;
+        margin: 20px;
+        padding: 10px;
+        background-color: royalblue;
+        border-radius: 10px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      #loader {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      .card-actions {
+        margin-top: 10px;
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
     <!---------------------------------------------------------------------------->
@@ -142,71 +163,16 @@
               user.profile.athlete_profile else 'N/A' }}
             </td>
             <td>
-              <a href="{{ url_for('view_athlete', user_id=user.userid) }}">View</a>
+  <a href="{{ url_for('view_athlete', user_id=user.userid) }}" class="btn btn-primary btn-sm">View</a>
+<a href="{{ url_for('send_message', receiver_id=user.userid) }}" class="btn btn-secondary btn-sm">Send Message</a>
+<a href="{{ url_for('send_offer', athlete_id=user.profile.athlete_profile.athleteprofileid) }}" class="btn btn-success btn-sm">Send Offer</a>
             </td>
           </tr>
           {% endif %} {% endfor %}
         </tbody>
       </table>
-      
 
-      <!----
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Profile Picture</th>
-            <th>Full Name</th>
-            <th>Gender</th>
-            <th>College</th>
-            <th>Sports Category</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for user in users %} {% if user.profile and
-          user.profile.verifiedstatus %}
-          <tr>
-            <td>
-              {% if user.profile.profilepicture %}
-              <img
-                src="{{ url_for('static', filename=user.profile.profilepicture) }}"
-                alt="Profile Picture"
-                width="30"
-              />
-              {% else %}
-              <img
-                src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}"
-                alt="Default Profile Picture"
-                width="30"
-              />
-              {% endif %}
-            </td>
-            <td>{{ user.profile.fullname }}</td>
-            <td>
-              {{ user.profile.athlete_profile.gender if
-              user.profile.athlete_profile else 'N/A' }}
-            </td>
-            <td>
-              {{ user.profile.athlete_profile.college.collegename if
-              user.profile.athlete_profile and
-              user.profile.athlete_profile.college else 'N/A' }}
-            </td>
-            <td>
-              {{ user.profile.athlete_profile.sportscategory if
-              user.profile.athlete_profile else 'N/A' }}
-            </td>
-            <td>
-              <a href="{{ url_for('view_athlete', user_id=user.userid) }}"
-                >View</a
-              >
-            </td>
-          </tr>
-          {% endif %} {% endfor %}
-        </tbody>
-      </table>
-    -->
-    
+
     </div>
   </body>
 </html>
-

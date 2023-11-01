@@ -1,0 +1,7 @@
+
+<h1>Your Sponsorees</h1>
+<ul>
+    {% for profile in sponsoree_profiles %}
+        <li>{{ profile.fullname }} - {{ profile.bio }}</li>
+    {% endfor %}
+</ul>

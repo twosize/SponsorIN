@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Offers</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Company Offers</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <ul>
+        {% for offer in offers %}
+            <li>
+                <p><strong>Athlete ID:</strong> {{ offer.athleteid }}</p>
+                <p><strong>Details:</strong> {{ offer.details }}</p>
+                <p><strong>Status:</strong> {{ offer.status }}</p>
+            </li>
+
+        <a href="{{ url_for('respond_offer', offer_id=offer.offerid) }}">Respond to Offer</a>
+
+        {% endfor %}
+    </ul>
+     <a href="{{ url_for('company_offer_history') }}" class="button">View Offer History</a>
+
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

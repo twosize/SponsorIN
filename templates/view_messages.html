@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Messages</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <h1>Messages</h1>
+    {% if users %}
+    <form method="GET" action="{{ url_for('view_messages') }}">
+    <input type="text" name="search" placeholder="Search by username..." value="{{ request.args.get('search', '') }}">
+    <select name="user_type">
+        <option value="" selected>All User Types</option>
+        <option value="admin" {% if request.args.get('user_type') == 'admin' %}selected{% endif %}>Admin</option>
+        <option value="company" {% if request.args.get('user_type') == 'company' %}selected{% endif %}>Company</option>
+        <option value="athlete" {% if request.args.get('user_type') == 'athlete' %}selected{% endif %}>Athlete</option>
+    </select>
+    <input type="submit" value="Search">
+</form>
+        <table>
+            <tr>
+                <th>User</th>
+                <th>User Type</th>
+                <th>Actions</th>
+            </tr>
+            {% for user in users %}
+                <tr>
+                    <td><a href="{{ url_for('view_conversation', other_user_id=user.userid) }}">{{ user.username }}</a></td>
+                    <td>{{ user.usertype }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_conversation_route', other_user_id=user.userid) }}" method="post" style="display: inline;">
+                            <input type="submit" value="Delete Conversation" onclick="return confirm('Are you sure you want to delete this conversation?');">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>You have no messages.</p>
+    {% endif %}
+    <a href="{{ url_for('dashboard') }}">Return to Dashboard</a>
+</body>
+</html>

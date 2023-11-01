@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Offers</title>
+</head>
+<body>
+    <h1>Your Offers</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if offers %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Offer Details</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for offer in offers %}
+                    <tr>
+                        <td>{{ offer.details }}</td>
+                        <td>{{ offer.status }}</td>
+                        <td>
+                            {% if offer.status == 'Pending' %}
+                                <form method="post" action="{{ url_for('accept_offer', offer_id=offer.offerid) }}">
+                                    <button type="submit">Accept</button>
+                                </form>
+                                <form method="post" action="{{ url_for('decline_offer', offer_id=offer.offerid) }}">
+                                    <button type="submit">Decline</button>
+                                </form>
+                                <form method="post" action="{{ url_for('counter_offer', offer_id=offer.offerid) }}">
+                                    <input type="text" name="counter_details" placeholder="Enter counter offer details">
+                                    <button type="submit">Counter Offer</button>
+                                </form>
+                            {% elif offer.status == 'Counter-offered' %}
+                                <p>Waiting for company response...</p>
+                            {% else %}
+                                <p>No actions available</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no offers at this time.</p>
+    {% endif %}
+    <a href="{{ url_for('view_offer_history') }}">
+    <button type="button">View Offers History</button>
+</a>
+ <a href="{{ url_for('dashboard') }}">Return to Dashboard</a>
+</body>
+</html>

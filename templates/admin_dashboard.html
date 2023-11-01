@@ -53,7 +53,9 @@
         <input class="button" type="submit" value="Admin User List">
     </form>
 
-
+ <form action="{{ url_for('view_messages') }}" method="get">
+        <input class="button" type="submit" value="View Messages">
+    </form>
 
 
     <form action="{{ url_for('add_admin') }}" method="get">

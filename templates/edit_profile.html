@@ -15,13 +15,13 @@
     crossorigin="anonymous"
   />
   <style>
- 
+
   </style>
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='profile_picture/Pepsi-logo.png') }}">
 
 </head>
 <body>
-    
+
     <div
       class="modal modal-sheet position-static d-block bg-body-secondary p-4 py-md-5"
       tabindex="-1"
@@ -40,7 +40,7 @@
             </ul>
             {% endif %} {% endwith %}
           </div>
-  
+
           <div class="modal-body p-5 pt-0">
             <form
               action="{{ url_for('edit_profile') }}"
@@ -67,7 +67,7 @@
                 <textarea id="bio" name="bio" class="form-control">{{ profile.bio if profile else '' }}</textarea
                 >
               </div>
-              
+
               {% if current_user.usertype == 'Athlete' %}
               <label for="gender" class="form-label">Gender:</label>
               <select id="gender" name="gender" class="form-select mb-3" >
@@ -75,14 +75,14 @@
                   <option value="Female" {% if athlete_profile and athlete_profile.gender == 'Female' %}selected{% endif %}>Female</option>
                   <option value="Other" {% if athlete_profile and athlete_profile.gender == 'Other' %}selected{% endif %}>Other</option>
               </select><br>
-  
+
               <label for="sports_category" class="form-label">Sports Category:</label>
               <select id="sports_category" name="sports_category" class="form-select mb-3" >
                   <option value="Basketball" {% if athlete_profile and athlete_profile.sportscategory == 'Basketball' %}selected{% endif %}>Basketball</option>
                   <option value="Football" {% if athlete_profile and athlete_profile.sportscategory == 'Football' %}selected{% endif %}>Football</option>
                   <option value="Soccer" {% if athlete_profile and athlete_profile.sportscategory == 'Soccer' %}selected{% endif %}>Soccer</option>
               </select><br>
-  
+
               <label for="college" class="form-label">College:</label>
               <select name="college" class="js-select2" style="width: 50%;" class="form-select mb-3" ></select>
               <script>
@@ -96,12 +96,12 @@
                   });
               </script>
             {% endif %}
-          
+
             {% if current_user.usertype == 'Company' %}
             <div class="mb-3">
                 <label for="company_name" class="form-label">Company Name:</label>
                 <input type="text" id="company_name" class="form-control form-control-sm" name="company_name" value="{{ company_profile.companyname if company_profile else '' }}" required><br>
-    
+
               </div>
 
             {% if company_profile and company_profile.companylogo %}
@@ -118,7 +118,7 @@
                </div>
                {% endif %}
              <hr class="my-4" />
-            
+
               <div class="mb-3 flex flex-wrap text-center">
              <div class="col-12">
                 <label for="profile_picture" class="form-label">Profile Picture:</label>
@@ -140,91 +140,20 @@
             <hr class="my-4" />
 
             <div class="text-center mb-2">
-              <a href="{{ url_for('company_dashboard') }}" class="btn btn-outline-success  w-75  my-4 " 
+              <a href="{{ url_for('company_dashboard') }}" class="btn btn-outline-success  w-75  my-4 "
                 >Return to Dashboard</a
               >
             </div>
-  
+
             </form>
-           
+
           </div>
-       
+
         </div>
       </div>
      >
     </div>
   </body>
-    <!--
 
-
-
-    <h1>Edit Your Profile</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <ul class="flashes">
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
-
-    <form action="{{ url_for('edit_profile') }}" method="post" enctype="multipart/form-data">
-        <label for="full_name">Full Name:</label>
-        <input type="text" id="full_name" name="full_name" value="{{ profile.fullname if profile else '' }}" required><br>
-
-        <label for="bio">Bio:</label>
-        <textarea id="bio" name="bio" required>{{ profile.bio if profile else '' }}</textarea><br>
-
-        {% if current_user.usertype == 'Athlete' %}
-            <label for="gender">Gender:</label>
-            <select id="gender" name="gender">
-                <option value="Male" {% if athlete_profile and athlete_profile.gender == 'Male' %}selected{% endif %}>Male</option>
-                <option value="Female" {% if athlete_profile and athlete_profile.gender == 'Female' %}selected{% endif %}>Female</option>
-                <option value="Other" {% if athlete_profile and athlete_profile.gender == 'Other' %}selected{% endif %}>Other</option>
-            </select><br>
-
-            <label for="sports_category">Sports Category:</label>
-            <select id="sports_category" name="sports_category">
-                <option value="Basketball" {% if athlete_profile and athlete_profile.sportscategory == 'Basketball' %}selected{% endif %}>Basketball</option>
-                <option value="Football" {% if athlete_profile and athlete_profile.sportscategory == 'Football' %}selected{% endif %}>Football</option>
-                <option value="Soccer" {% if athlete_profile and athlete_profile.sportscategory == 'Soccer' %}selected{% endif %}>Soccer</option>
-            </select><br>
-
-            <label for="college">College:</label>
-            <select name="college" class="js-select2" style="width: 50%;"></select>
-            <script>
-                $(document).ready(function() {
-                    $('.js-select2').select2({
-                        ajax: {
-                            url: '{{ url_for("get_colleges") }}',
-                            dataType: 'json'
-                        }
-                    });
-                });
-            </script>
-        {% endif %}
-
-        {% if current_user.usertype == 'Company' %}
-            <label for="company_name">Company Name:</label>
-            <input type="text" id="company_name" name="company_name" value="{{ company_profile.companyname if company_profile else '' }}" required><br>
-
-            <label for="company_logo">Company Logo:</label>
-            {% if company_profile and company_profile.companylogo %}
-                <img style="width:200px; height:auto;" src="{{ url_for('static', filename=company_profile.companylogo) }}" alt="Company Logo">
-            {% endif %}
-            <input type="file" id="company_logo" name="company_logo" accept="image/*"><br>
-        {% endif %}
-
-        <label for="profile_picture">Profile Picture:</label>
-        {% if profile and profile.profilepicture %}
-            <img style="width:200px; height:auto;" src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture">
-        {% endif %}
-        <input type="file" id="profile_picture" name="profile_picture" accept="image/*"><br>
-        <input type="submit" value="Update Profile">
-    </form>
-</body>
-    -->
 
 </html>
-

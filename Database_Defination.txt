@@ -74,3 +74,13 @@ CREATE TABLE Watchlist (
     AthleteID INTEGER REFERENCES AthleteProfile(AthleteProfileID),
     SportsCategory SportsCategoryType
 );
+
+--Sponsorship Table
+CREATE TABLE Sponsorship (
+    SponsorshipID SERIAL PRIMARY KEY,
+    CompanyID INTEGER REFERENCES CompanyProfile(CompanyProfileID),
+    AthleteID INTEGER REFERENCES AthleteProfile(AthleteProfileID),
+    StartDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    EndDate TIMESTAMP,
+    Details TEXT
+);
