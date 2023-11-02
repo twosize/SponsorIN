@@ -44,29 +44,55 @@
         >
       </div>
     </header>
-    <!--
+    <!------------------------------------------------------------------------>
 
-    <form method="POST" action="{{ url_for('company_user_list_page') }}">
-        <input type="text" name="search" placeholder="Search companies...">
-        <select name="verification_filter">
+
+    <div class="container">
+      <form
+        method="POST"
+        action="{{ url_for('company_user_list_page') }}"
+        class="row g-3"
+      >
+        <div class="col-md-5">
+          <input
+            type="text"
+            class="form-control"
+            name="search"
+            placeholder="Search by Companies..."
+          />
+        </div>
+        <div class="col-md-2">
+          <select name="gender_filter" class="form-select">
             <option value="">All Verification Status</option>
             <option value="Verified">Verified</option>
             <option value="Not Verified">Not Verified</option>
-        </select>
-        <input type="submit" value="Search">
-    </form>
+          </select>
+        </div>
+        <div class="col-md-1">
+          <input type="submit" value="Search" class="form-control" />
+        </div>
+      </form>
+    </div>
 
-    <table border="1">
+    <!---------------------------------------------------------------------------->
+    <div class="container my-4 rounded-3 ">
+      <table class="table table-striped-columns border border-warning-subtle" border="1">
+        <thead>
+
         <tr>
-            <th>Company Logo</th>
-            <th>User ID</th>
-            <th>Username</th>
-            <th>Company Name</th>
-            <th>Verified</th>
-            <th>Actions</th>
+            <th scope="col">Company Logo</th>
+            <th scope="col">User ID</th>
+            <th scope="col">Username</th>
+            <th scope="col">Company Name</th>
+            <th scope="col">Verified</th>
+            <th scope="col">Actions</th>
 
         </tr>
         {% for user in users %}
+
+        </thead>
+        <tbody>
+
         <tr>
             <td>
                 {% if user.profile and user.profile.company_profile and user.profile.company_profile.companylogo %}
@@ -86,7 +112,9 @@
 
 </td>
         {% endfor %}
-    </table>
+      </tbody>
+
+      </table>
 
 </body>
 </html>
