@@ -44,10 +44,15 @@
     </tr>
 </table>
 <h3>Sponsorship:</h3>
-{% if sponsored %}
-    <p>This athlete is sponsored by <strong>{{ sponsor_company.companyname }}</strong>.</p>
+{% if sponsor_companies %}
+    <p>This athlete is sponsored by:</p>
+    <ul>
+        {% for company_name in sponsor_companies %}
+            <li><strong>{{ company_name }}</strong></li>
+        {% endfor %}
+    </ul>
 {% else %}
-    <p>This athlete is not sponsored by your company.</p>
+    <p>This athlete is not sponsored by any company.</p>
 {% endif %}
 <h3>Actions:</h3>
 

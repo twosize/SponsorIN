@@ -17,7 +17,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisshouldbesecret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://egekeser:1954@localhost:5432/sponsorin'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://brandontiong:BT2129bt@localhost:5432/sponsorin'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -518,7 +518,15 @@ def remove_from_watchlist(athlete_id):
     return redirect(url_for('company_dashboard'))
 
 @app.route('/view_athletes', methods=['GET', 'POST'])
+@login_required
 def view_athletes():
+    current_company_profile = None
+    if current_user.usertype == 'Company':
+        current_company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+
+    sponsored_athletes = []
+    if current_company_profile:
+        sponsored_athletes = [s.athleteid for s in Sponsorship.query.filter_by(companyid=current_company_profile.companyprofileid).all()]
 
     query = User.query.filter_by(usertype='Athlete').join(Profile, User.profile).filter(
         Profile.verifiedstatus == True).join(AthleteProfile)
@@ -545,30 +553,20 @@ def view_athletes():
     sports_categories = [c.sportscategory for c in AthleteProfile.query.distinct(AthleteProfile.sportscategory).all()]
 
     return render_template('athlete_list_for_company.html', users=verified_athletes, colleges=colleges,
-                           sports_categories=sports_categories)
+                           sports_categories=sports_categories, sponsored_athletes=sponsored_athletes)
 
 
 @app.route('/athlete/<int:user_id>')
 @login_required
 def view_athlete(user_id):
     athlete = User.query.get_or_404(user_id)
-    company_profile_id = CompanyProfile.query.filter_by(
-        profileid=current_user.profile.profileid).first().companyprofileid
-
+    sponsorships = Sponsorship.query.filter_by(athleteid=athlete.profile.athlete_profile.athleteprofileid).all()
+    sponsor_companies = [CompanyProfile.query.get(s.companyid).companyname for s in sponsorships]
+    current_company_profile_id = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first().companyprofileid
     is_in_watchlist = Watchlist.query.filter_by(athleteid=athlete.profile.athlete_profile.athleteprofileid,
-                                                companyid=company_profile_id).first() is not None
-
-    sponsorship = Sponsorship.query.filter_by(athleteid=athlete.profile.athlete_profile.athleteprofileid,
-                                              companyid=company_profile_id).first()
-    if sponsorship:
-        sponsored = True
-        sponsor_company = CompanyProfile.query.get(company_profile_id)
-    else:
-        sponsored = False
-        sponsor_company = None
-
-    return render_template('athlete_detail.html', athlete=athlete, is_in_watchlist=is_in_watchlist, sponsored=sponsored,
-                           sponsor_company=sponsor_company)
+                                                companyid=current_company_profile_id).first() is not None
+    return render_template('athlete_detail.html', athlete=athlete, is_in_watchlist=is_in_watchlist,
+                           sponsor_companies=sponsor_companies)
 
 
 @app.route('/admin/dashboard')
@@ -826,12 +824,6 @@ def redirect_to_dashboard():
     else:
         flash('Unknown user type', 'danger')
         return redirect(url_for('index'))
-@app.route('/get_messages')
-@login_required
-def get_messages():
-    user_id = current_user.userid
-    messages = Message.query.filter_by(receiverid=user_id).all()
-    return jsonify([{'subject': message.subject, 'body': message.body} for message in messages])
 
 @app.route('/view_messages', methods=['GET'])
 @login_required
@@ -847,7 +839,7 @@ def view_messages():
     users_query = User.query.filter(
         (User.userid.in_(sent_messages) | User.userid.in_(received_messages)) &
         (User.userid != current_user_id)
-    )
+    ).join(Profile, User.profile)
 
     if search_query:
         users_query = users_query.filter(User.username.ilike(f'%{search_query}%'))
@@ -855,9 +847,11 @@ def view_messages():
     if user_type_filter:
         users_query = users_query.filter(User.usertype == user_type_filter)
 
-    users = users_query.distinct().all()
+    users_with_details = users_query.distinct().all()
 
-    return render_template('view_messages.html', users=users, search_query=search_query, user_type_filter=user_type_filter)
+    return render_template('view_messages.html', users=users_with_details, search_query=search_query, user_type_filter=user_type_filter)
+
+
 @app.route('/view_conversation/<int:other_user_id>')
 @login_required
 def view_conversation(other_user_id):
@@ -913,8 +907,13 @@ def view_offers():
         flash('Athlete profile not found!', 'error')
         return redirect(url_for('dashboard'))
 
-    pending_offers = Offer.query.filter_by(athleteid=athlete_profile.athleteprofileid, status='Pending').all()
-    return render_template('view_offers.html', offers=pending_offers, title='Pending Offers')
+    relevant_offers = Offer.query.filter(
+        Offer.athleteid == athlete_profile.athleteprofileid,
+        or_(Offer.status == 'Pending',
+            and_(Offer.status == 'Counter-offered', Offer.last_updated_by == 'Company'))
+    ).all()
+
+    return render_template('view_offers.html', offers=relevant_offers, title='Your Offers')
 
 @app.route('/view_offer_history')
 @login_required
@@ -976,6 +975,7 @@ def counter_offer(offer_id):
     if offer and offer.athleteid == athlete_profile.athleteprofileid:
         offer.status = 'Counter-offered'
         offer.details = counter_details
+        offer.last_updated_by = 'Athlete'
         db.session.commit()
         flash('Offer countered successfully!', 'success')
     else:
@@ -990,8 +990,10 @@ def company_offers():
     if not company_profile:
         flash('Company profile not found!', 'error')
         return redirect(url_for('dashboard'))
-
-    offers = Offer.query.filter_by(companyid=company_profile.companyprofileid, status='Pending').all()
+    offers = Offer.query.filter(
+        Offer.companyid == company_profile.companyprofileid,
+        Offer.status.in_(['Pending', 'Counter-offered'])
+    ).all()
     return render_template('company_offers.html', offers=offers)
 @app.route('/company_offer_history')
 @login_required
@@ -1028,34 +1030,48 @@ def respond_offer(offer_id):
     athlete_profile = AthleteProfile.query.get(offer.athleteid)
     profile = Profile.query.get(athlete_profile.profileid) if athlete_profile else None
 
-
     if offer.status not in ['Counter-offered', 'Pending']:
-        print("Redirecting because of offer status")
         flash('This offer cannot be responded to.', 'error')
         return redirect(url_for('company_offers'))
 
     if offer.status == 'Pending' and offer.last_updated_by == 'Company':
-        print("Redirecting because last updated by company on a pending offer")
         flash('Waiting for the athlete to respond.', 'info')
         return redirect(url_for('company_offers'))
+
     if request.method == 'POST':
         action = request.form.get('action')
         if action == 'accept':
             offer.status = 'Accepted'
+            if current_user.usertype == 'Athlete':
+                # Create a new sponsorship record for athletes
+                sponsorship = Sponsorship(companyid=offer.companyid, athleteid=offer.athleteid,
+                                          details="Details of the sponsorship")
+                db.session.add(sponsorship)
+            db.session.commit()
+            flash('Offer accepted successfully!', 'success')
         elif action == 'decline':
             offer.status = 'Declined'
+            db.session.commit()
+            flash('Offer declined successfully!', 'success')
         elif action == 'counter':
             details = request.form.get('details')
-            if details:  # Ensure details are provided for a counter offer
+            if details:
                 offer.details = details
                 offer.status = 'Counter-offered'
                 offer.last_updated_by = 'Company'
+                db.session.commit()
+                flash('Counter offer sent successfully!', 'success')
             else:
                 flash('Please provide details for the counter offer.', 'error')
                 return render_template('company_respond_offer.html', offer=offer, profile=profile)
-        db.session.commit()
-        flash('Response sent successfully!', 'success')
-        return redirect(url_for('company_offers'))
+        else:
+            return redirect(url_for('company_offers'))
+
+
+        if current_user.usertype == 'Athlete':
+            return redirect(url_for('view_offers'))
+        else:
+            return redirect(url_for('company_offers'))
 
     return render_template('company_respond_offer.html', offer=offer, profile=profile)
 
@@ -1079,19 +1095,22 @@ def view_sponsorees():
     return render_template('view_sponsorees.html', sponsoree_profiles=sponsoree_profiles)
 
 
-
 @app.route('/athlete/sponsors')
 @login_required
 def view_sponsors():
     athlete_profile = AthleteProfile.query.filter_by(profileid=current_user.profile.profileid).first()
     if not athlete_profile:
         flash('Athlete profile not found.', 'danger')
-        return redirect(url_for('dashboard'))  # Redirect to a dashboard or another appropriate page
+        return redirect(url_for('dashboard'))
 
     sponsorships = Sponsorship.query.filter_by(athleteid=athlete_profile.athleteprofileid).all()
-    sponsors = [CompanyProfile.query.get(sponsorship.companyid) for sponsorship in sponsorships]
-    return render_template('view_sponsors.html', sponsors=sponsors)
+    sponsors = []
+    for sponsorship in sponsorships:
+        company = CompanyProfile.query.get(sponsorship.companyid)
+        user = User.query.join(Profile).filter(Profile.profileid == company.profileid).first()
+        sponsors.append((company, user))
 
+    return render_template('view_sponsors.html', sponsors=sponsors)
 
 
 @app.route('/aboutus')

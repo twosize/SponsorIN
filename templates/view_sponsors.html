@@ -4,19 +4,41 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Sponsors</title>
+    <title>My Sponsors</title>
 </head>
 <body>
     <h1>My Sponsors</h1>
     {% if sponsors %}
-        <ul>
-            {% for sponsor in sponsors %}
-                <li>{{ sponsor.companyname }}</li>
-            {% endfor %}
-        </ul>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Company Logo</th>
+                    <th>Company Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company, user in sponsors %}
+                    <tr>
+                        <td>
+                            {% if company.companylogo %}
+                                <img src="{{ url_for('static', filename=company.companylogo) }}" alt="Company Logo" width="50">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='default_picture/default_company.png') }}" alt="Default Company Logo" width="50">
+                            {% endif %}
+                        </td>
+                        <td>{{ company.companyname }}</td>
+                        <td>
+                            <a href="{{ url_for('view_single_company', company_id=company.companyprofileid) }}">View Details</a> |
+                            <a href="{{ url_for('send_message', receiver_id=user.userid) }}">Send Message</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% else %}
         <p>No sponsors found.</p>
     {% endif %}
-    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a> <!-- Change 'dashboard' to the correct route name -->
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
 </body>
 </html>

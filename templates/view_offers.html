@@ -45,11 +45,17 @@
                                     <input type="text" name="counter_details" placeholder="Enter counter offer details">
                                     <button type="submit">Counter Offer</button>
                                 </form>
-                            {% elif offer.status == 'Counter-offered' %}
-                                <p>Waiting for company response...</p>
+                             {% elif offer.status == 'Counter-offered' and offer.last_updated_by == 'Company' %}
+                                 <p>Company has made a counter offer. Respond or negotiate further:</p>
+                                <form method="post" action="{{ url_for('respond_offer', offer_id=offer.offerid) }}">
+                                    <input type="hidden" name="action" value="counter">
+                                    <button type="submit">Respond to Counter</button>
+                                </form>
+
                             {% else %}
                                 <p>No actions available</p>
                             {% endif %}
+
                         </td>
                     </tr>
                 {% endfor %}
@@ -58,9 +64,10 @@
     {% else %}
         <p>You have no offers at this time.</p>
     {% endif %}
+
     <a href="{{ url_for('view_offer_history') }}">
-    <button type="button">View Offers History</button>
-</a>
- <a href="{{ url_for('dashboard') }}">Return to Dashboard</a>
+        <button type="button">View Offers History</button>
+    </a>
+    <a href="{{ url_for('dashboard') }}">Return to Dashboard</a>
 </body>
 </html>

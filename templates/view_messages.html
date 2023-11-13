@@ -48,8 +48,10 @@
             </tr>
             {% for user in users %}
                 <tr>
-                    <td><a href="{{ url_for('view_conversation', other_user_id=user.userid) }}">{{ user.username }}</a></td>
-                    <td>{{ user.usertype }}</td>
+<td>
+                <img src="{{ url_for('static', filename=user.profile.profilepicture) if user.profile.profilepicture else url_for('static', filename='default_profile_pic.jpg') }}" alt="Profile Picture" style="width: 50px; height: 50px;">
+                <a href="{{ url_for('view_conversation', other_user_id=user.userid) }}">{{ user.profile.fullname if user.profile else user.username }}</a>
+            </td>                    <td>{{ user.usertype }}</td>
                     <td>
                         <form action="{{ url_for('delete_conversation_route', other_user_id=user.userid) }}" method="post" style="display: inline;">
                             <input type="submit" value="Delete Conversation" onclick="return confirm('Are you sure you want to delete this conversation?');">

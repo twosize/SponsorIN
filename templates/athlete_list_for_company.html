@@ -165,8 +165,11 @@
             <td>
   <a href="{{ url_for('view_athlete', user_id=user.userid) }}" class="btn btn-primary btn-sm">View</a>
 <a href="{{ url_for('send_message', receiver_id=user.userid) }}" class="btn btn-secondary btn-sm">Send Message</a>
-<a href="{{ url_for('send_offer', athlete_id=user.profile.athlete_profile.athleteprofileid) }}" class="btn btn-success btn-sm">Send Offer</a>
-            </td>
+ {% if user.profile.athlete_profile.athleteprofileid not in sponsored_athletes %}
+            <a href="{{ url_for('send_offer', athlete_id=user.profile.athlete_profile.athleteprofileid) }}" class="btn btn-success btn-sm">Send Offer</a>
+        {% else %}
+            <span>Already Sponsored</span>
+        {% endif %}            </td>
           </tr>
           {% endif %} {% endfor %}
         </tbody>

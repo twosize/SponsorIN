@@ -1,7 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Sponsorees</title>
+    <!-- Include Bootstrap CSS or other stylesheets here -->
+</head>
+<body>
+    <h1>Your Sponsorees</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Profile Picture</th>
+                <th>Full Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for profile in sponsoree_profiles %}
+                <tr>
+                    <td>
+                        <img src="{{ url_for('static', filename=profile.profilepicture) if profile.profilepicture else url_for('static', filename='default_profile_pic.jpg') }}" alt="Profile Picture" style="width: 50px; height: 50px;">
+                    </td>
+                    <td>{{ profile.fullname }}</td>
+                    <td>
+                        <a href="{{ url_for('view_athlete', user_id=profile.userid) }}" class="btn btn-primary btn-sm">View</a>
+                        <a href="{{ url_for('send_message', receiver_id=profile.userid) }}" class="btn btn-secondary btn-sm">Send Message</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<h1>Your Sponsorees</h1>
-<ul>
-    {% for profile in sponsoree_profiles %}
-        <li>{{ profile.fullname }} - {{ profile.bio }}</li>
-    {% endfor %}
-</ul>
+    <a href="{{ url_for('company_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
