@@ -26,6 +26,9 @@
                     <td>
                         <a href="{{ url_for('view_athlete', user_id=profile.userid) }}" class="btn btn-primary btn-sm">View</a>
                         <a href="{{ url_for('send_message', receiver_id=profile.userid) }}" class="btn btn-secondary btn-sm">Send Message</a>
+                        <form action="{{ url_for('remove_sponsorship', athlete_id=profile.athlete_profile.athleteprofileid) }}" method="post">
+                            <input type="submit" value="Remove Sponsorship" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this sponsorship?');">
+                        </form>
                     </td>
                 </tr>
             {% endfor %}

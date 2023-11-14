@@ -23,18 +23,27 @@
         <table border="1">
             <thead>
                 <tr>
+                    <th>Company</th>
                     <th>Offer Details</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for offer in offers %}
+                {% for offer, company_profile, user_profile in offers %}
                     <tr>
+                        <td>
+                            {% if company_profile.companylogo %}
+                                <img src="{{ url_for('static', filename=company_profile.companylogo) }}" alt="Company Logo" width="30">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='default_company_logo.jpg') }}" alt="Default Company Logo" width="30">
+                            {% endif %}
+                            {{ user_profile.fullname }}
+                        </td>
                         <td>{{ offer.details }}</td>
                         <td>{{ offer.status }}</td>
                         <td>
-                            {% if offer.status == 'Pending' %}
+{% if offer.status == 'Pending' %}
                                 <form method="post" action="{{ url_for('accept_offer', offer_id=offer.offerid) }}">
                                     <button type="submit">Accept</button>
                                 </form>
@@ -55,7 +64,6 @@
                             {% else %}
                                 <p>No actions available</p>
                             {% endif %}
-
                         </td>
                     </tr>
                 {% endfor %}

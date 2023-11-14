@@ -23,13 +23,22 @@
         <table border="1">
             <thead>
                 <tr>
+                    <th>Company</th>
                     <th>Offer Details</th>
                     <th>Status</th>
                 </tr>
             </thead>
             <tbody>
-                {% for offer in offers %}
+                {% for offer, company_profile, user_profile in offers %}
                     <tr>
+                        <td>
+                            {% if company_profile.companylogo %}
+                                <img src="{{ url_for('static', filename=company_profile.companylogo) }}" alt="Company Logo" width="30">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='default_company_logo.jpg') }}" alt="Default Company Logo" width="30">
+                            {% endif %}
+                            {{ user_profile.fullname }}
+                        </td>
                         <td>{{ offer.details }}</td>
                         <td>{{ offer.status }}</td>
                     </tr>
@@ -39,6 +48,10 @@
     {% else %}
         <p>You have no past offers at this time.</p>
     {% endif %}
- <a href="{{ url_for('view_offers') }}">Return to Offers</a>
+    <form action="{{ url_for('clear_offer_history') }}" method="post">
+        <input type="submit" value="Clear Offer History" onclick="return confirm('Are you sure you want to clear the offer history?');">
+    </form>
+
+    <a href="{{ url_for('view_offers') }}">Return to Offers</a>
 </body>
 </html>

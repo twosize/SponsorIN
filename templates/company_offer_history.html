@@ -18,14 +18,18 @@
         {% endif %}
     {% endwith %}
     <ul>
-        {% for offer in offers %}
+        {% for offer, athlete_profile, profile in offers %}
             <li>
-                <p><strong>Athlete ID:</strong> {{ offer.athleteid }}</p>
+                <img src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture" width="30">
+                <p><strong>Athlete Name:</strong> {{ profile.fullname }}</p>
                 <p><strong>Details:</strong> {{ offer.details }}</p>
                 <p><strong>Status:</strong> {{ offer.status }}</p>
             </li>
         {% endfor %}
     </ul>
+    <form action="{{ url_for('clear_offer_history') }}" method="post">
+        <input type="submit" value="Clear Offer History" onclick="return confirm('Are you sure you want to clear all offer history?');">
+    </form>
     <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
 </body>
 </html>

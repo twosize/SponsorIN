@@ -907,13 +907,20 @@ def view_offers():
         flash('Athlete profile not found!', 'error')
         return redirect(url_for('dashboard'))
 
+    relevant_offers_data = []
     relevant_offers = Offer.query.filter(
         Offer.athleteid == athlete_profile.athleteprofileid,
         or_(Offer.status == 'Pending',
             and_(Offer.status == 'Counter-offered', Offer.last_updated_by == 'Company'))
     ).all()
 
-    return render_template('view_offers.html', offers=relevant_offers, title='Your Offers')
+    for offer in relevant_offers:
+        company_profile = CompanyProfile.query.filter_by(companyprofileid=offer.companyid).first()
+        if company_profile:
+            user_profile = Profile.query.filter_by(profileid=company_profile.profileid).first()
+            relevant_offers_data.append((offer, company_profile, user_profile))
+
+    return render_template('view_offers.html', offers=relevant_offers_data, title='Your Offers')
 
 @app.route('/view_offer_history')
 @login_required
@@ -923,11 +930,19 @@ def view_offer_history():
         flash('Athlete profile not found!', 'error')
         return redirect(url_for('dashboard'))
 
+    non_pending_offers_data = []
     non_pending_offers = Offer.query.filter(
         Offer.athleteid == athlete_profile.athleteprofileid,
         Offer.status != 'Pending'
     ).all()
-    return render_template('view_offer_history.html', offers=non_pending_offers)
+
+    for offer in non_pending_offers:
+        company_profile = CompanyProfile.query.get(offer.companyid)
+        if company_profile:
+            user_profile = Profile.query.filter_by(profileid=company_profile.profileid).first()
+            non_pending_offers_data.append((offer, company_profile, user_profile))
+
+    return render_template('view_offer_history.html', offers=non_pending_offers_data)
 
 @app.route('/accept_offer/<int:offer_id>', methods=['POST'])
 @login_required
@@ -990,11 +1005,22 @@ def company_offers():
     if not company_profile:
         flash('Company profile not found!', 'error')
         return redirect(url_for('dashboard'))
-    offers = Offer.query.filter(
+
+    offers = db.session.query(
+        Offer,
+        AthleteProfile,
+        Profile
+    ).join(
+        AthleteProfile, Offer.athleteid == AthleteProfile.athleteprofileid
+    ).join(
+        Profile, AthleteProfile.profileid == Profile.profileid
+    ).filter(
         Offer.companyid == company_profile.companyprofileid,
         Offer.status.in_(['Pending', 'Counter-offered'])
     ).all()
+
     return render_template('company_offers.html', offers=offers)
+
 @app.route('/company_offer_history')
 @login_required
 def company_offer_history():
@@ -1003,11 +1029,54 @@ def company_offer_history():
         flash('Company profile not found!', 'error')
         return redirect(url_for('dashboard'))
 
+    non_pending_offers_data = []
     non_pending_offers = Offer.query.filter(
         Offer.companyid == company_profile.companyprofileid,
-        Offer.status != 'Pending'
+        Offer.status.in_(['Accepted', 'Declined'])
     ).all()
-    return render_template('company_offer_history.html', offers=non_pending_offers)
+
+    for offer in non_pending_offers:
+        athlete_profile = AthleteProfile.query.filter_by(athleteprofileid=offer.athleteid).first()
+        if athlete_profile:
+            profile = Profile.query.filter_by(profileid=athlete_profile.profileid).first()
+            non_pending_offers_data.append((offer, athlete_profile, profile))
+
+    return render_template('company_offer_history.html', offers=non_pending_offers_data)
+
+
+@app.route('/clear_offer_history', methods=['POST'])
+@login_required
+def clear_offer_history():
+    if current_user.usertype == 'Company':
+        company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+        if company_profile:
+            Offer.query.filter(
+                Offer.companyid == company_profile.companyprofileid,
+                Offer.status.in_(['Accepted', 'Declined'])
+            ).delete()
+            db.session.commit()
+            flash('Offer history cleared successfully!', 'success')
+        else:
+            flash('Company profile not found!', 'error')
+        return redirect(url_for('company_offer_history'))
+
+    elif current_user.usertype == 'Athlete':
+        athlete_profile = AthleteProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+        if athlete_profile:
+            Offer.query.filter(
+                Offer.athleteid == athlete_profile.athleteprofileid,
+                Offer.status.in_(['Accepted', 'Declined'])
+            ).delete()
+            db.session.commit()
+            flash('Offer history cleared successfully!', 'success')
+        else:
+            flash('Athlete profile not found!', 'error')
+        return redirect(url_for('view_offer_history'))
+
+    else:
+        flash('Unauthorized action', 'error')
+        return redirect(url_for('dashboard'))
+
 
 @app.route('/company_offers/send/<int:athlete_id>', methods=['GET', 'POST'])
 @login_required
@@ -1042,8 +1111,8 @@ def respond_offer(offer_id):
         action = request.form.get('action')
         if action == 'accept':
             offer.status = 'Accepted'
-            if current_user.usertype == 'Athlete':
-                # Create a new sponsorship record for athletes
+            # Create a new sponsorship record when the company accepts the offer
+            if current_user.usertype == 'Company':
                 sponsorship = Sponsorship(companyid=offer.companyid, athleteid=offer.athleteid,
                                           details="Details of the sponsorship")
                 db.session.add(sponsorship)
@@ -1067,7 +1136,6 @@ def respond_offer(offer_id):
         else:
             return redirect(url_for('company_offers'))
 
-
         if current_user.usertype == 'Athlete':
             return redirect(url_for('view_offers'))
         else:
@@ -1075,6 +1143,39 @@ def respond_offer(offer_id):
 
     return render_template('company_respond_offer.html', offer=offer, profile=profile)
 
+@app.route('/company_offers/modify/<int:offer_id>', methods=['GET', 'POST'])
+@login_required
+def modify_offer(offer_id):
+    offer = Offer.query.get_or_404(offer_id)
+
+    company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+    if offer.companyid != company_profile.companyprofileid:
+        flash('Unauthorized action.', 'error')
+        return redirect(url_for('company_offers'))
+
+    if request.method == 'POST':
+        offer.details = request.form.get('details')
+        db.session.commit()
+        flash('Offer updated successfully!', 'success')
+        return redirect(url_for('company_offers'))
+
+    return render_template('modify_offer.html', offer=offer)
+
+
+@app.route('/company_offers/retract/<int:offer_id>', methods=['POST'])
+@login_required
+def retract_offer(offer_id):
+    offer = Offer.query.get_or_404(offer_id)
+
+    company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+    if offer.companyid != company_profile.companyprofileid:
+        flash('Unauthorized action.', 'error')
+        return redirect(url_for('company_offers'))
+
+    db.session.delete(offer)
+    db.session.commit()
+    flash('Offer retracted successfully!', 'success')
+    return redirect(url_for('company_offers'))
 
 
 @app.route('/view_sponsorees')
@@ -1112,6 +1213,26 @@ def view_sponsors():
 
     return render_template('view_sponsors.html', sponsors=sponsors)
 
+
+@app.route('/remove_sponsorship/<int:athlete_id>', methods=['POST'])
+@login_required
+def remove_sponsorship(athlete_id):
+    company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
+    if not company_profile:
+        flash('Company profile not found!', 'error')
+        return redirect(url_for('dashboard'))
+
+    sponsorship_to_remove = Sponsorship.query.filter_by(companyid=company_profile.companyprofileid,
+                                                        athleteid=athlete_id).first()
+
+    if sponsorship_to_remove:
+        db.session.delete(sponsorship_to_remove)
+        db.session.commit()
+        flash('Sponsorship removed successfully!', 'success')
+    else:
+        flash('Sponsorship not found!', 'error')
+
+    return redirect(url_for('view_sponsorees'))
 
 @app.route('/aboutus')
 def about_us():

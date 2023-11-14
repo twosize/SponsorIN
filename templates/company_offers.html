@@ -18,19 +18,24 @@
         {% endif %}
     {% endwith %}
     <ul>
-        {% for offer in offers %}
+        {% for offer, athlete_profile, profile in offers %}
             <li>
-                <p><strong>Athlete ID:</strong> {{ offer.athleteid }}</p>
+                <img src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture" width="50">
+                <p><strong>Athlete:</strong> {{ profile.fullname }}</p>
                 <p><strong>Details:</strong> {{ offer.details }}</p>
                 <p><strong>Status:</strong> {{ offer.status }}</p>
+                {% if offer.status == 'Counter-offered' %}
+                    <a href="{{ url_for('respond_offer', offer_id=offer.offerid) }}">Respond to Offer</a>
+                {% elif offer.status == 'Pending' %}
+                    <a href="{{ url_for('modify_offer', offer_id=offer.offerid) }}" class="button">Modify Offer</a>
+                    <form action="{{ url_for('retract_offer', offer_id=offer.offerid) }}" method="post">
+                        <input type="submit" value="Retract Offer" onclick="return confirm('Are you sure you want to retract this offer?');">
+                    </form>
+                {% endif %}
             </li>
-
-        <a href="{{ url_for('respond_offer', offer_id=offer.offerid) }}">Respond to Offer</a>
-
         {% endfor %}
     </ul>
-     <a href="{{ url_for('company_offer_history') }}" class="button">View Offer History</a>
-
+    <a href="{{ url_for('company_offer_history') }}" class="button">View Offer History</a>
     <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
 </body>
 </html>

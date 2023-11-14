@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Modify Offer</title>
+</head>
+<body>
+    <h1>Modify Offer</h1>
+    <form method="POST" action="{{ url_for('modify_offer', offer_id=offer.offerid) }}">
+        <label for="details">Offer Details:</label><br>
+        <textarea id="details" name="details">{{ offer.details }}</textarea><br>
+        <input type="submit" value="Update Offer">
+    </form>
+    <a href="{{ url_for('company_offers') }}">Back to Offers</a>
+</body>
+</html>
