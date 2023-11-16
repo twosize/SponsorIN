@@ -667,7 +667,6 @@ def verify_profile(profile_id):
 @app.route('/verify_user/<int:user_id>', methods=['POST'])
 @login_required
 def verify_user(user_id):
-    # Ensure only Admins can access this route
     if current_user.usertype != 'Admin':
         flash('Unauthorized action.', 'error')
         return redirect(url_for('dashboard'))
@@ -679,7 +678,7 @@ def verify_user(user_id):
         flash('User verified successfully!', 'success')
 
         if user.usertype == 'Athlete':
-            return redirect(url_for('athlete_user_list_page'))  # Replace with your athlete list page route
+            return redirect(url_for('user_list_page'))
         elif user.usertype == 'Company':
             return redirect(url_for('company_user_list_page'))  # Replace with your company list page route
     else:
