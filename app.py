@@ -17,7 +17,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisshouldbesecret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://brandontiong:BT2129bt@localhost:5432/sponsorin'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:e@localhost:5432/sponsorIn'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
