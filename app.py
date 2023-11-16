@@ -17,7 +17,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisshouldbesecret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:e@localhost:5432/sponsorIn'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://brandontiong:BT2129bt@localhost:5432/sponsorin'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -662,6 +662,30 @@ def verify_profile(profile_id):
 
     flash('Profile successfully verified', 'success')
     return redirect(url_for('unverified_profiles_page'))
+
+
+@app.route('/verify_user/<int:user_id>', methods=['POST'])
+@login_required
+def verify_user(user_id):
+    if current_user.usertype != 'Admin':
+        flash('Unauthorized action.', 'error')
+        return redirect(url_for('dashboard'))
+
+    user = User.query.get_or_404(user_id)
+    if user.profile:
+        user.profile.verifiedstatus = True
+        db.session.commit()
+        flash('User verified successfully!', 'success')
+
+        if user.usertype == 'Athlete':
+            return redirect(url_for('user_list_page'))
+        elif user.usertype == 'Company':
+            return redirect(url_for('company_user_list_page'))  # Replace with your company list page route
+    else:
+        flash('Invalid user.', 'error')
+
+    return redirect(url_for('dashboard'))
+
 @app.route('/admin/user_list', methods=['GET', 'POST'])
 @login_required
 def user_list_page():
