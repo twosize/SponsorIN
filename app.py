@@ -575,9 +575,14 @@ def admin_dashboard():
     if current_user.usertype != 'Admin':
         flash('Permission Denied: You are not an administrator', 'danger')
         return redirect(url_for('index'))
+
     unverified_profiles = Profile.query.filter_by(verifiedstatus=False).all()
-    users = User.query.all()
-    return render_template('admin_dashboard.html', unverified_profiles=unverified_profiles, users=users)
+    all_users = User.query.all()
+
+    athletes = [user for user in all_users if user.usertype == 'Athlete'][:3]
+    companies = [user for user in all_users if user.usertype == 'Company'][:3]
+
+    return render_template('admin_dashboard.html', unverified_profiles=unverified_profiles, athletes=athletes, companies=companies)
 
 
 

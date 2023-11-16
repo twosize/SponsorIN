@@ -133,19 +133,15 @@
 
 
             <!---------------------------------------------------------------------------->
-            <div class="album py-5">
-              <div class="container">
-  
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                  {% set card_count = 0 %}
-                  {% for user in users %}
-  
-                  {% if user.usertype == 'Athlete' %}
-                  {% if card_count < 3 %} 
-  
+           <div class="album py-5">
+    <div class="container">
+        <div class="row">
+            {% for user in athletes %}
+                <div class="col-md-4">
+
                   <div class="col">
                     <div class="card shadow-sm">
-  
+
                       {% if user.profile and user.profile.profilepicture %}
                       <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture"
                         width="100%" height="225" class="rounded-3">
@@ -153,22 +149,22 @@
                       <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}"
                         alt="Default Profile Picture" width="100%" height="225" class="rounded-3">
                       {% endif %}
-  
-  
-  
+
+
+
                       <div class="card-body ">
                         <h5 class="card-title justify-content-between ">
                           {{ user.username }}
-  
-  
+
+
                           <span class="badge bg-primary rounded-pill">
                             {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile else
                             'N/A'
                             }}
                           </span>
-  
-  
-  
+
+
+
                           {% if user.profile and user.profile.verifiedstatus %}
                           <span class="badge bg-success rounded-pill">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -176,11 +172,11 @@
                               <path
                                 d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
                             </svg>
-  
+
                           </span>
                           {% else %}
                           <span class="badge bg-danger rounded-pill">
-  
+
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                               class="bi bi-x" viewBox="0 0 16 16">
                               <path
@@ -189,7 +185,7 @@
                             {% endif %}
                           </span>
                         </h5>
-  
+
                         <p class="card-text">
                         <ul class="list-group list-group-flush">
                           <li class="list-group-item">Gender:
@@ -199,10 +195,10 @@
                           </li>
                           <li class="list-group-item">
                             verifiedstatus: {{ 'Yes' if user.profile and user.profile.verifiedstatus else 'No' }}
-  
+
                           </li>
                         </ul>
-  
+
                         </p>
                         <div class="d-flex justify-content-between align-items-center">
                           <div class="btn-group">
@@ -216,24 +212,23 @@
                           </div>
                           <small class="text-body-secondary">ID:
                             {{ user.userid }}
-  
+
                           </small>
                         </div>
                       </div>
                     </div>
                   </div>
-                  {% set card_count = card_count + 1 %}
-                  {% endif %}
-                  {% endif %}
-                  {% endfor %}
-  
-  
-  
+
+
+
+
                 </div>
+                      {% endfor %}
+
               </div>
             </div>
           </div>
-        
+
 
         </div>
 
@@ -252,27 +247,19 @@
         </div>
         <div class="row" id="section2">
           <div id="color-container1">
-          
-  
+
+
             <!---------------------------------------------------------------------------->
 
-
-            <div class="album py-5">
-
-              <div class="container">
-  
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                  {% set count = 0 %}
-  
-                  {% for user in users %}
-  
-                  {% if user.usertype == 'Company' %}
-                  {% if count < 1 %}
-
-  
+<div class="album py-5">
+    <div class="container">
+        <div class="row">
+            {% for user in companies %}
+                <div class="col-md-4">
                   <div class="col">
+
                     <div class="card shadow-sm">
-  
+
                       {% if user.profile and user.profile.profilepicture %}
                       <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture"
                         width="100%" height="225" class="rounded-3">
@@ -280,22 +267,22 @@
                       <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}"
                         alt="Default Profile Picture" width="100%" height="225" class="rounded-3">
                       {% endif %}
-  
-  
-  
+
+
+
                       <div class="card-body ">
                         <h5 class="card-title justify-content-between ">
                           {{ user.username }}
-  
-  
+
+
                           <span class="badge bg-primary rounded-pill">
                             {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile else
                             'N/A'
                             }}
                           </span>
-  
-  
-  
+
+
+
                           {% if user.profile and user.profile.verifiedstatus %}
                           <span class="badge bg-success rounded-pill">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -303,11 +290,11 @@
                               <path
                                 d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
                             </svg>
-  
+
                           </span>
                           {% else %}
                           <span class="badge bg-danger rounded-pill">
-  
+
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                               class="bi bi-x" viewBox="0 0 16 16">
                               <path
@@ -316,7 +303,7 @@
                             {% endif %}
                           </span>
                         </h5>
-  
+
                         <p class="card-text">
                         <ul class="list-group list-group-flush">
                           <li class="list-group-item">Gender:
@@ -326,10 +313,10 @@
                           </li>
                           <li class="list-group-item">
                             verifiedstatus: {{ 'Yes' if user.profile and user.profile.verifiedstatus else 'No' }}
-  
+
                           </li>
                         </ul>
-  
+
                         </p>
                         <div class="d-flex justify-content-between align-items-center">
                           <div class="btn-group">
@@ -343,21 +330,15 @@
                           </div>
                           <small class="text-body-secondary">ID:
                             {{ user.userid }}
-  
+
                           </small>
                         </div>
                       </div>
                     </div>
                   </div>
-  
-                  {% set count = count + 1 %}
-                  {% endif %}
-                  {% endif %}
-                  {% endfor %}
-  
-  
-  
                 </div>
+                  {% endfor %}
+
               </div>
             </div>
 
@@ -367,10 +348,12 @@
       </div>
     </div>
   </div>
+  </div>
+  </div>
 
 
 </body>
 
 </html>
-<!-- 
+<!--
  -->
