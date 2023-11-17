@@ -12,21 +12,9 @@
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='profile_picture/Pepsi-logo.png') }}" />
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
+       body {
+        overflow-x: hidden;
+       }
     </style>
 </head>
 
@@ -41,14 +29,76 @@
             </a>
         </div>
         <div class="col-sm-3 text-center">
-            <h2 class="fw-bold">Sponsors</h2>
+            <h2 class="fw-bold">My Sponsors</h2>
 
         </div>
         <div class="col-md-3 text-end">
             <a href="{{ url_for('company_dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
         </div>
     </header>
-    <h1>My Sponsors</h1>
+
+
+    <!---------------------------------------------------------------------------->
+    <div class="album">
+        <div class="container">
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                {% if sponsors %}
+
+
+                {% for company, user in sponsors %}
+
+                <div class="col">
+                    <div class="card shadow-sm bg-primary-subtle rounded-4">
+
+                        <div class="container p-2">
+                            {% if company.companylogo %}
+                            <img src="{{ url_for('static', filename=company.companylogo) }}" alt="Company Logo" width="100%"
+                                height="225" class="rounded-3">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='default_picture/default_company.png') }}"
+                                alt="Default Company Logo" width="100%" height="225" class="rounded-3">
+                            {% endif %}
+                        </div>
+                      
+
+                        <div class="card-body bg-primary-subtle rounded-4">
+                            <h5 class="card-title justify-content-between ">
+                                {{ company.companyname }}
+
+                            </h5>
+
+                            <p class="card-text">
+                                company description: {{ company.companydescription }}
+                          
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center row">
+                                <div class="col-md-8">
+                                    <div class="btn-group col-12">
+                                        <a href="{{ url_for('view_single_company', company_id=company.companyprofileid) }}" class="btn btn-sm btn-outline-success">View Details</a>
+                                        <a href="{{ url_for('send_message', receiver_id=user.userid) }}" class="btn btn-sm btn-outline-primary">Send Message</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <small class="text-body-secondary col-12">ID: {{ user.userid }}</small>
+                                </div>
+                            </div>
+
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <p>No sponsors found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!----
+
     {% if sponsors %}
         <table class="table">
             <thead>
@@ -80,6 +130,9 @@
     {% else %}
         <p>No sponsors found.</p>
     {% endif %}
-    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+
+-->
+
 </body>
+
 </html>
