@@ -33,14 +33,80 @@
         </div>
     </header>
 
+<!---------------------------------------------------------------------------->
 
-    <h1>Companies</h1>
+<div class="container">
+    <form method="POST" action="{{ url_for('view_company') }}" class="row g-3">
+        <div class="col-md-5">
+  
+          <input type="text" name="search" class="form-control" placeholder="Search by Company Name...">
+  </div>  
+  <div class="col-md-1">
+      <input type="submit" value="Search" class="form-control">
+  
+  </div>
+      </form>
+  </div>
 
-    <form method="POST" action="{{ url_for('view_company') }}">
-        <input type="text" name="search" placeholder="Search by Company Name...">
+  <!---------------------------------------------------------------------------->
+  <div class="album py-5">
+    <div class="container">
+  
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+        {% for company, user_id in companies %}
+  
+  
+  
+        <div class="col">
+          <div class="card shadow-sm">
+  
+  
+            {% if company.companylogo %}
+            <img src="{{ url_for('static', filename=company.companylogo) }}" alt="Company Logo" width="100%"
+            height="225" class="rounded-3">
+        {% else %}
+            <img src="{{ url_for('static', filename='default_picture/default_company.png') }}" alt="Default Company Logo" width="100%"
+            height="225" class="rounded-3">
+        {% endif %}
+  
+          
+  
+            <div class="card-body bg-info-subtle">
+              <h5 class="card-title justify-content-between ">
+                {{ company.companyname }}
+              
+  
+  
+  
+  
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  
+              <a href="{{ url_for('view_single_company', company_id=company.companyprofileid) }}"
+              class="btn btn-sm btn-outline-success"
+              >View Details</a> 
+              <a href="{{ url_for('send_message', receiver_id=user_id) }}"
+              class="btn btn-sm btn-outline-success"
+              >Send Message</a>
+  
+             
+              </div>
+            </div>
+          </div>
+        </div>
+  
+  
+  {% endfor %}
+        
+  
+      </div>
+    </div>
+  </div>
+  
 
-        <input type="submit" value="Search">
-    </form>
+<!-----
+    
 
     <table border="1">
         <thead>
@@ -73,6 +139,6 @@
     </table>
 
     <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
-
+--->
 </body>
 </html>
