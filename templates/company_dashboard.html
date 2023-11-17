@@ -1,192 +1,329 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      href="{{ url_for('static', filename='profile_picture/Pepsi-logo.png') }}"
-    />
-    <style>
-      nav ul {
-        padding: 0;
-        list-style: none;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
 
-      nav ul li {
-        display: inline-block;
-        margin: 5px;
-      }
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='profile_picture/Pepsi-logo.png') }}" />
 
-      nav ul li a,
-      .support-button {
-        display: inline-block;
-        padding: 10px 20px;
-        color: #ffffff;
-        text-decoration: none;
-        border-radius: 5px;
-      }
 
-      nav ul li a {
-        background-color: #007bff;
-      }
+  <style>
+    body
+    {
+      overflow-x: hidden;
+    }
+  </style>
+</head>
 
-      nav ul li a:hover {
-        background-color: #0056b3;
-      }
+<body>
+  <!-------------------------------------------------------------------------------------------------->
+  <header
+    class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom m-2 p-2 bg-primary-subtle rounded-4">
+    <div class="col-md-3 mb-2 mb-md-0">
+      <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
+        <img src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}" alt="SponsorIn_Logo"
+          style="width: 300px; height: 150px" />
+      </a>
+    </div>
 
-      .support-button {
-        background-color: #28a745;
-        margin-top: 20px;
-      }
+    <div class="col-md-3 text-end">
+      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Return to Home</a>
+      <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
+    </div>
+  </header>
+  <!-------------------------------------------------------------------------------------------------->
 
-      .support-button:hover {
-        background-color: #218838;
-      }
-    </style>
-  </head>
+  <div class="text-center">
+    <div class="row align-items-center  justify-content-center">
+      <div class="col-8 col-lg-3 border border-secondary bg-primary-subtle  rounded-4 m-2 p-2 align-self-start">
 
-  <body>
-    <!-------------------------------------------------------------------------------------------------->
-    <header
-      class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom m-2 p-2 bg-primary-subtle rounded-4"
-    >
-      <div class="col-md-3 mb-2 mb-md-0">
-        <a
-          href="/"
-          class="d-inline-flex link-body-emphasis text-decoration-none"
-        >
-          <img
-            src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}"
-            alt="SponsorIn_Logo"
-            style="width: 300px; height: 150px"
-          />
-        </a>
+        <div class="modal-header p-2 pb-2 border-bottom-0">
+          <p class="fw-semibold mb-0 fs-2">{{ current_user.username }}</p>
+          {% if profile and
+          profile.profilepicture %}
+          <img style="width: 50px; height: auto; border-radius: 50%;"
+            src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture" />
+          {% else %}
+          <img class="h-100 w-100 rounded-5"
+            src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}"
+            alt="Default Profile Picture" />
+          {% endif %}
+        </div>
+
+        <div class="container my-2">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+          <ul class="flashes">
+            {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %} {% endwith %} {% if company_profile %}
+          <p>
+            <strong>Company Name:</strong> {{ company_profile.companyname}}
+          </p>
+          {% if company_profile.companylogo %}
+          <img style="width: 300px; height: auto" src="{{ url_for('static', filename=company_profile.companylogo) }}"
+            alt="Company Logo" />
+          {% else %}
+          <img src="{{ url_for('static', filename='default_picture/default_company.png') }}"
+            alt="Default Profile Picture" />
+          {% endif %} {% endif %}
+
+        </div>
+        <hr class="my-4" />
+
+        <div class="modal-body p-3 pt-0">
+
+
+          <h2 class="fs-5 fw-semibold mb-2">Options</h2>
+
+          <div class="btn-group" aria-label="Basic example">
+            {% if not profile_exists %}
+            <a href="{{ url_for('create_profile') }}" class="btn btn-outline-warning">Create Profile</a>
+            {% else %}
+            <a href="{{ url_for('edit_profile') }}" class="btn btn-warning">Edit Profile</a>
+            {% endif %}
+           
+            <a href="{{ url_for('view_sponsorees') }}" class="btn btn-success">View
+              Sponsorees</a>
+
+            <a href="{{ url_for('view_messages') }}" class="btn btn-primary">View
+              Messages</a>
+
+
+          </div>
+
+
+
+        </div>
+        <hr class="my-4" />
+
+        <a href="{{ url_for('delete_account') }}"
+          onclick="return confirm('Are you sure you want to delete your account? This action is irreversible.');"
+          class="w-100 py-2 mb-2 btn btn-outline-danger rounded-3">Delete Account</a>
+        </form>
+        <div class="text-end">
+          <a href="{{ url_for('contact_support') }}" class="">Contact Support</a>
+        </div>
+
       </div>
 
-      <div class="col-md-3 text-end">
-        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary"
-          >Return to Home</a
-        >
-        <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
-      </div>
-    </header>
-    <!-------------------------------------------------------------------------------------------------->
 
-    <div class="container-fluid">
-        <div class="row">
-          <div class="col-lg-5 col-md-12">
-            <!-- User profile container -->
-            <div class="card-body bg-primary-subtle rounded-4">
-              <div class="modal-content rounded-4 shadow">
-                <div class="modal-header p-5 pb-4 border-bottom-0">
-                  <p class="fw-semibold mb-0 fs-2">{{ current_user.username }}</p>
-                  {% if profile and
-                    profile.profilepicture %}
-                    <img
-                      style="width: 50px; height: auto; border-radius: 50%;"
-                      src="{{ url_for('static', filename=profile.profilepicture) }}"
-                      alt="Profile Picture"
-                    />
+
+      <div class="col-10 col-lg-8 bg-primary-subtle rounded-4 m-2 p-2 border border-secondary align-self-start ">
+        <div class="row my-2">
+          <div class="col-12 col-lg-6">
+            <h3 class="fw-semibold">View Athlete</h1>
+          </div>
+
+          <div class="col-12 col-lg-4 text-end">
+
+            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+              <a href="{{ url_for('view_athletes') }}" class="btn btn-outline-primary">View
+                Athletes</a>
+
+              <a href="{{ url_for('view_watchlist') }}" class="btn btn-outline-light">View
+                Watchlist</a>
+
+              <a href="{{ url_for('company_offers') }}" class="btn btn-outline-info">View
+                Offers</a>
+
+            </div>
+
+
+
+
+          </div>
+
+        </div>
+
+        <div class="row" id="section1">
+          <div class="album py-5">
+            <div class="container">
+        
+              <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                {% for user in athletes %}
+        
+        
+                <div class="col">
+                  <div class="card shadow-sm">
+        
+                    {% if user.profile and user.profile.profilepicture %}
+                    <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture" width="100%"
+                      height="225"
+                      class="rounded-3">
                     {% else %}
-                    <img
-                      class="h-100 w-100 rounded-5"
-                      src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}"
-                      alt="Default Profile Picture"
-                    />
+                    <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}"
+                      alt="Default Profile Picture" width="100%" height="225"
+                      class="rounded-3"
+                      >
                     {% endif %}
-                </div>
-                <div class="modal-body p-5 pt-0">
-                  <form class="">
-                    <div class="form-floating mb-3">
-                      {% with messages = get_flashed_messages(with_categories=true) %}
-                      {% if messages %}
-                      <ul class="flashes">
-                        {% for category, message in messages %}
-                        <li class="{{ category }}">{{ message }}</li>
-                        {% endfor %}
-                      </ul>
-                      {% endif %} {% endwith %} {% if company_profile %}
-                      <p>
-                        <strong>Company Name:</strong> {{ company_profile.companyname}}
+        
+        
+        
+                    <div class="card-body ">
+                      <h5 class="card-title justify-content-between ">
+                        {{ user.username }}
+        
+        
+                        <span class="badge bg-primary rounded-pill">
+                        {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile else 'N/A'
+                        }}
+                        </span>
+        
+        
+        
+                        {% if user.profile and user.profile.verifiedstatus %}
+                        <span class="badge bg-success rounded-pill">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                            <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/>
+                          </svg>
+        
+                        </span>
+                          {% else %}
+                        <span class="badge bg-danger rounded-pill">
+        
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                          </svg>
+                         {% endif %}
+                        </span>
+                      </h5>
+        
+                      <p class="card-text">
+                        <ul class="list-group list-group-flush">
+                          <li class="list-group-item">Gender:
+                            {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile else 'N/A'
+                            }}
+                          </li>
+        
+                        </ul>
+        
                       </p>
-                      {% if company_profile.companylogo %}
-                      <img
-                        style="width: 300px; height: auto"
-                        src="{{ url_for('static', filename=company_profile.companylogo) }}"
-                        alt="Company Logo"
-                      />
-                      {% else %}
-                      <img
-                        src="{{ url_for('static', filename='default_picture/default_company.png') }}"
-                        alt="Default Profile Picture"
-                      />
-                      {% endif %} {% endif %}
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                          <a href="{{ url_for('view_athlete', user_id=user.userid) }}"
+                            class="btn btn-sm btn-outline-success">View</a>
+                          <a href="{{ url_for('send_message', receiver_id=user.userid) }}"
+                            class="btn btn-sm btn-outline-danger">Message</a>
+                          {% if user.profile.athlete_profile.athleteprofileid not in sponsored_athletes %}
+                          <a href="{{ url_for('send_offer', athlete_id=user.profile.athlete_profile.athleteprofileid) }}"
+                            class="btn btn-sm btn-outline-primary">Send Offer</a>
+                          {% else %}
+                          <span>Already Sponsored</span>
+                          {% endif %}
+        
+        
+                        </div>
+                      </div>
                     </div>
-      
-                    <h2 class="fs-5 fw-bold mb-3">Options</h2>
-                    {% if not profile_exists %}
-                    <a
-                      href="{{ url_for('create_profile') }}"
-                      class="w-100 py-2 mb-2 btn btn-info rounded-3"
-                      >Create Profile</a
-                    >
-                    {% else %}
-                    <a
-                      href="{{ url_for('edit_profile') }}"
-                      class="w-100 py-2 mb-2 btn btn-outline-secondary rounded-3"
-                      >Edit Profile</a
-                    >
-                    {% endif %}
-                    <a
-                      href="{{ url_for('view_athletes') }}"
-                      class="w-100 py-2 mb-2 btn btn-success rounded-3"
-                      >View Athletes</a
-                    >
-                    <a
-                      href="{{ url_for('view_watchlist') }}"
-                      class="w-100 py-2 mb-2 btn btn-primary rounded-3"
-                      >View Watchlist</a
-                    >
-                    <a href="{{ url_for('view_messages') }}" 
-                    class="w-100 py-2 mb-2 btn btn-secondary rounded-3"
-                     >View Messages</a
-                            >
-                    <a href="{{ url_for('company_offers') }}"
-                    class="w-100 py-2 mb-2 btn btn-warning rounded-3"
-                    >View Offers</a>
-                    <a href="{{ url_for('view_sponsorees') }}" 
-                    class="w-100 py-2 mb-2 btn btn-primary rounded-3"
-                    >View Sponsorees</a
-                  >
-
-                  <hr class="my-4" />
-
-                    <a
-                      href="{{ url_for('delete_account') }}"
-                      onclick="return confirm('Are you sure you want to delete your account? This action is irreversible.');"
-                      class="w-100 py-2 mb-2 btn btn-outline-danger rounded-3"
-                      >Delete Account</a
-                    >
-                  </form>
-                  <div class="text-end">
-                    <a href="{{ url_for('contact_support') }}" class=""
-                    >Contact Support</a>
                   </div>
-                 
                 </div>
+        
+        
+                {% endfor %}
+        
               </div>
             </div>
           </div>
-          </div>    
-  </body>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+  <!----
+
+<div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-5 col-md-12">
+        <div class="card-body bg-primary-subtle rounded-4">
+          <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-5 pb-4 border-bottom-0">
+              <p class="fw-semibold mb-0 fs-2">{{ current_user.username }}</p>
+              {% if profile and
+              profile.profilepicture %}
+              <img style="width: 50px; height: auto; border-radius: 50%;"
+                src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture" />
+              {% else %}
+              <img class="h-100 w-100 rounded-5"
+                src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}"
+                alt="Default Profile Picture" />
+              {% endif %}
+            </div>
+            <div class="modal-body p-5 pt-0">
+              <form class="">
+                <div class="form-floating mb-3">
+                  {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                  <ul class="flashes">
+                    {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %} {% endwith %} {% if company_profile %}
+                  <p>
+                    <strong>Company Name:</strong> {{ company_profile.companyname}}
+                  </p>
+                  {% if company_profile.companylogo %}
+                  <img style="width: 300px; height: auto"
+                    src="{{ url_for('static', filename=company_profile.companylogo) }}" alt="Company Logo" />
+                  {% else %}
+                  <img src="{{ url_for('static', filename='default_picture/default_company.png') }}"
+                    alt="Default Profile Picture" />
+                  {% endif %} {% endif %}
+                </div>
+
+                <h2 class="fs-5 fw-bold mb-3">Options</h2>
+                {% if not profile_exists %}
+                <a href="{{ url_for('create_profile') }}" class="w-100 py-2 mb-2 btn btn-info rounded-3">Create
+                  Profile</a>
+                {% else %}
+                <a href="{{ url_for('edit_profile') }}" class="w-100 py-2 mb-2 btn btn-outline-secondary rounded-3">Edit
+                  Profile</a>
+                {% endif %}
+
+
+                <a href="{{ url_for('view_athletes') }}" class="w-100 py-2 mb-2 btn btn-success rounded-3">View
+                  Athletes</a>
+                <a href="{{ url_for('view_watchlist') }}" class="w-100 py-2 mb-2 btn btn-primary rounded-3">View
+                  Watchlist</a>
+                <a href="{{ url_for('view_messages') }}" class="w-100 py-2 mb-2 btn btn-secondary rounded-3">View
+                  Messages</a>
+                <a href="{{ url_for('company_offers') }}" class="w-100 py-2 mb-2 btn btn-warning rounded-3">View
+                  Offers</a>
+                <a href="{{ url_for('view_sponsorees') }}" class="w-100 py-2 mb-2 btn btn-primary rounded-3">View
+                  Sponsorees</a>
+
+                <hr class="my-4" />
+
+                <a href="{{ url_for('delete_account') }}"
+                  onclick="return confirm('Are you sure you want to delete your account? This action is irreversible.');"
+                  class="w-100 py-2 mb-2 btn btn-outline-danger rounded-3">Delete Account</a>
+              </form>
+              <div class="text-end">
+                <a href="{{ url_for('contact_support') }}" class="">Contact Support</a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  -->
+</body>
+
 </html>
