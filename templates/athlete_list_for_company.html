@@ -156,11 +156,12 @@
                   <a href="{{ url_for('send_offer', athlete_id=user.profile.athlete_profile.athleteprofileid) }}"
                     class="btn btn-sm btn-outline-primary">Send Offer</a>
                   {% else %}
-                  <span>Already Sponsored</span>
-                  {% endif %}
-
+            
 
                 </div>
+                <span>Sponsored</span>
+                {% endif %}
+
               </div>
             </div>
           </div>
@@ -176,9 +177,6 @@
 </body>
 
 </html>
-
-
-
 
 
 
