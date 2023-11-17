@@ -515,7 +515,7 @@ def remove_from_watchlist(athlete_id):
     except IntegrityError:
         db.session.rollback()
         flash('There was an error removing the athlete from the watchlist.', 'danger')
-    return redirect(url_for('company_dashboard'))
+    return redirect(url_for('view_watchlist'))
 
 @app.route('/view_athletes', methods=['GET', 'POST'])
 @login_required
