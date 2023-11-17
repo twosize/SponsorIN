@@ -89,24 +89,14 @@
             </td>
             <td>{{ athlete.sportscategory }}</td>
             <td>
-              <a
-                href="{{ url_for('view_athlete', user_id=athlete.profile.appuser.userid) }}"
-                >View</a
-              >
-              |
-              <a
-                href="{{ url_for('send_message', receiver_id=athlete.profile.appuser.userid) }}"
-                >Send Message</a
-              >
-  
-              <form
-                method="POST"
-                style="display: inline"
-                action="{{ url_for('remove_from_watchlist', athlete_id=athlete.athleteprofileid) }}"
-              >
-                <button type="submit">Remove</button>
-              </form>
-            </td>
+              <div class="btn-group" role="group" aria-label="Button group">
+                  <a href="{{ url_for('view_athlete', user_id=athlete.profile.appuser.userid) }}" class="btn btn-primary">View</a>
+                  <a href="{{ url_for('send_message', receiver_id=athlete.profile.appuser.userid) }}" class="btn btn-secondary">Send Message</a>
+                  <form method="POST" style="display: inline" action="{{ url_for('remove_from_watchlist', athlete_id=athlete.athleteprofileid) }}">
+                      <button type="submit" class="btn btn-danger">Remove</button>
+                  </form>
+              </div>
+          </td>
         </tr>
         {% else %} 
         <tr>

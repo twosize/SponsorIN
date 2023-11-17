@@ -19,7 +19,78 @@
     <title>Company Offer History</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
+<header
+class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom m-2 p-5 bg-primary-subtle rounded-4">
+<div class="col-md-3 mb-md-0 mb-md-0">
+    <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
+        <img src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}" alt="SponsorIn_Logo"
+            style="width: 300px; height: 120px" />
+    </a>
+</div>
+<div class="col-sm-3 text-center">
+    <h1 class="mb-4">Company Offer History</h1>
+
+
+</div>
+<div class="col-md-3 text-end">
+
+    <div class="container flex flex-wrap">
+       
+        <div class="">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+        </div>
+    </div>
+  
+</div>
+</header>
 <body>
+        <div class="container text-center">
+            <form action="{{ url_for('clear_offer_history') }}" method="post">
+                <input type="submit" value="Clear Offer History" class="btn btn-danger" onclick="return confirm('Are you sure you want to clear the offer history?');">
+            </form>
+        </div>
+        <div class="container my-4 rounded-3">
+    
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+    
+            {% if offers %}
+                <table class="table table-striped-columns border border-warning-subtle" border="1">
+                    <thead>
+                        <tr>
+                            <th>Athlete</th>
+                            <th>Offer Details</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for offer, athlete_profile, profile in offers %}
+                        <tr>
+                            <td>
+                                <img src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture" width="30">
+                                {{ profile.fullname }}
+                            </td>
+                            <td>{{ offer.details }}</td>
+                            <td>{{ offer.status }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="alert alert-info">You have no past offers at this time.</p>
+            {% endif %}
+            
+        </div>
+    <!--
+
     <h1>Company Offer History</h1>
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -44,5 +115,8 @@
         <input type="submit" value="Clear Offer History" onclick="return confirm('Are you sure you want to clear all offer history?');">
     </form>
     <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+
+    -->
+
 </body>
 </html>

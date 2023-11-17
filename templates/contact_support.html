@@ -49,31 +49,35 @@
      </header>
      <!---------------------------------------------------------------------------->
 
-
-    <table border="1">
-        <tr>
-            <th>Profile Picture</th>
-            <th>Username</th>
-            <th>Contact</th>
-        </tr>
-        {% for user in users %}
-            {% if user.usertype == 'Admin' %}
-            <tr>
-                <td>
-                     {% if user.profile and user.profile.profilepicture %}
-                        <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture" width="30">
-                    {% else %}
-                        <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}" alt="Default Profile Picture" width="30">
-                    {% endif %}
-                </td>
-                <td>{{ user.username }}</td>
-                <td>
-                    <a href="{{ url_for('send_message', receiver_id=user.userid) }}">Contact</a>
-
-                </td>
-            </tr>
-            {% endif %}
-        {% endfor %}
-    </table>
+     <div class="container my-4 rounded-3">
+      <table class="table table-striped-columns border border-warning-subtle">
+          <thead>
+              <tr>
+                  <th>Profile Picture</th>
+                  <th>Username</th>
+                  <th>Contact</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for user in users %}
+                  {% if user.usertype == 'Admin' %}
+                  <tr>
+                      <td>
+                          {% if user.profile and user.profile.profilepicture %}
+                              <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture" width="30">
+                          {% else %}
+                              <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}" alt="Default Profile Picture" width="30">
+                          {% endif %}
+                      </td>
+                      <td>{{ user.username }}</td>
+                      <td>
+                          <a href="{{ url_for('send_message', receiver_id=user.userid) }}" class="btn btn-primary">Contact</a>
+                      </td>
+                  </tr>
+                  {% endif %}
+              {% endfor %}
+          </tbody>
+      </table>
+  </div>
 </body>
 </html>

@@ -49,7 +49,8 @@
     </header>
 
 <body>
-    <h1>Company Offers</h1>
+
+    
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flashes">
@@ -59,6 +60,48 @@
             </ul>
         {% endif %}
     {% endwith %}
+    <div
+    class="continer my-4 text-center">
+    <a href="{{ url_for('company_offer_history') }}" class="btn btn-info">View Offer History</a>
+</div>
+
+    <div class="container my-4 rounded-3" id="merge">
+        <table class="table table-striped-columns border border-warning-subtle" border="1">
+            <thead>
+                <tr>
+                    <th scope="col">Profile Picture</th>
+                    <th scope="col">Full Name</th>
+                    <th scope="col">Details</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for offer, athlete_profile, profile in offers %}
+                <tr>
+                    <td>
+                        <img src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture" width="30">
+                    </td>
+                    <td>{{ profile.fullname }}</td>
+                    <td>{{ offer.details }}</td>
+                    <td>{{ offer.status }}</td>
+                    <td>
+                        {% if offer.status == 'Counter-offered' %}
+                            <a href="{{ url_for('respond_offer', offer_id=offer.offerid) }}">Respond to Offer</a>
+                        {% elif offer.status == 'Pending' %}
+                            <a href="{{ url_for('modify_offer', offer_id=offer.offerid) }}" class="button">Modify Offer</a>
+                            <form action="{{ url_for('retract_offer', offer_id=offer.offerid) }}" method="post">
+                                <input type="submit" value="Retract Offer" onclick="return confirm('Are you sure you want to retract this offer?');">
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+<!-------
+    <div id="merge_main">
     <ul>
         {% for offer, athlete_profile, profile in offers %}
             <li>
@@ -78,6 +121,8 @@
         {% endfor %}
     </ul>
     <a href="{{ url_for('company_offer_history') }}" class="button">View Offer History</a>
-    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+-->
+</div>
 </body>
 </html>
+
