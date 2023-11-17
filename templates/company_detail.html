@@ -37,31 +37,29 @@
 
 
     <header
-    class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 border-bottom m-2  mb-0 p-2 bg-primary-subtle rounded-4">
-    <div class="col-md-3 mb-2 mb-md-0">
-        <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
-            <img src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}" alt="SponsorIn_Logo"
-                style="width: 300px; height: 100px" />
-        </a>
-    </div>
-    <div class="col-md-3 mb-2 mb-md-0 text-center">
-        <h2>Company Details</h2>
-    </div>
+        class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 border-bottom m-2  mb-0 p-2 bg-primary-subtle rounded-4">
+        <div class="col-md-3 mb-2 mb-md-0">
+            <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
+                <img src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}" alt="SponsorIn_Logo"
+                    style="width: 300px; height: 100px" />
+            </a>
+        </div>
+        <div class="col-md-3 mb-2 mb-md-0 text-center">
+            <h2>Company Details</h2>
+        </div>
 
-    <div class="col-md-3 text-end">
-        <a href="{{ url_for('view_company') }}"
-        class="btn btn-outline-success  w-75  my-4 ">Back to Companies
-        List</a>
-    </div>
-</header>
-<!----------->
+        <div class="col-md-3 text-end">
+            <a href="{{ url_for('view_company') }}" class="btn btn-outline-success  w-75  my-4 ">Back to Companies
+                List</a>
+        </div>
+    </header>
+    <!----------->
 
 
-    <div class="modal modal-sheet position-static d-block mt-0" tabindex="-1" role="dialog"
-        id="modalSignin">
+    <div class="modal modal-sheet position-static d-block mt-0" tabindex="-1" role="dialog" id="modalSignin">
         <div class="modal-dialog " role="document">
             <div class="modal-content rounded-4 shadow bg-primary-subtle">
-                
+
                 <div class="modal-body p-5 pt-0">
                     <form action="{{ url_for('edit_profile') }}" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
@@ -89,7 +87,7 @@
 
 
                         <div class="mb-1 flex flex-wrap ">
-                         
+
                             <div class="col-12">
 
                                 {% if company.profile %}
@@ -108,19 +106,19 @@
 
                             </div>
 
-                            
-                        <div class="mb-3 text-center">
-                            {% if company.profile and current_user.is_authenticated %}
-                            <a href="{{ url_for('send_message', receiver_id=company.profile.userid) }}" 
-                            class="btn btn-outline-primary  w-75  my-4 ">Send Message</a>
-                            {% endif %}
-                        </div>
+
+                            <div class="mb-3 text-center">
+                                {% if company.profile and current_user.is_authenticated %}
+                                <a href="{{ url_for('send_message', receiver_id=company.profile.userid) }}"
+                                    class="btn btn-outline-primary  w-75  my-4 ">Send Message</a>
+                                {% endif %}
+                            </div>
 
 
                             <hr class="my-4" />
 
                             <div class="mb-3 flex flex-wrap text-center">
-                              
+
                                 <div class="col-12">
                                     {% if profile and profile.profilepicture %}
                                     <img style="width: 200px; height: auto"
@@ -199,4 +197,5 @@
 </body>
 
 </html>
+
 
