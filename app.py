@@ -871,7 +871,7 @@ def view_messages():
     ).join(Profile, User.profile)
 
     if search_query:
-        users_query = users_query.filter(User.username.ilike(f'%{search_query}%'))
+        users_query = users_query.filter(Profile.fullname.ilike(f'%{search_query}%'))
 
     if user_type_filter:
         users_query = users_query.filter(User.usertype == user_type_filter)

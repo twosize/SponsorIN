@@ -125,43 +125,4 @@
 
 
 
-<!------------------------
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
-    <h1>Conversation with {{ other_user.username }}</h1>
-
-
-    {% if messages %}
-    {% for message, sender_username, receiver_username in messages %}
-    <div
-        class="message-container {% if message.senderid == current_user.get_id() %}sent-by-current-user{% else %}sent-by-other-user{% endif %}">
-        <div class="date">{{ message.timestamp.strftime('%m/%d/%Y') }}</div>
-        <div class="message-header">
-            {{ sender_username }}
-        </div>
-        <div class="message-content">
-            <p>{{ message.content }}</p>
-        </div>
-        <div class="time">{{ message.timestamp.strftime('%I:%M %p') }}</div>
-    </div>
-    {% endfor %}
-    {% else %}
-    <p>No messages in this conversation.</p>
-    {% endif %}
-
-
-    <form action="{{ url_for('send_message', receiver_id=other_user.userid) }}" method="post">
-        <textarea name="content" required></textarea><br>
-        <input type="submit" value="Send Message">
-    </form>
-    <a href="{{ url_for('view_messages') }}">Back to Messages</a>
-
----->
-
-
 
