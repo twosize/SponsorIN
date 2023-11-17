@@ -31,6 +31,116 @@
         </div>
     </header>
 
+    <div class="modal modal-sheet position-static d-block mt-0" tabindex="-1" role="dialog" id="modalSignin">
+        <div class="modal-dialog " role="document">
+            <div class="modal-content rounded-4 shadow bg-primary-subtle">
+    
+                <div class="modal-body p-5 pt-0">
+                    <div>
+                        <div class="mb-3">
+                            <!------------------------------->
+                        </div>
+                        <div class=" mb-3">
+                            <label for="username" class="form-label">
+                                <h2>{{ athlete.profile.fullname }}'s Profile</h2>
+    
+    
+                            </label>
+    
+                        </div>
+                        <div class="mb-3 text-center">
+    
+                            <img src="{{ url_for('static', filename=athlete.profile.profilepicture) }}"
+                                alt="Profile Picture" style="width:200px; height:auto;">
+    
+    
+    
+                        </div>
+    
+    
+    
+                        <div class="mb-1 flex flex-wrap ">
+    
+                            <div class="col-12">
+                                <div class="row mb-1">
+                                    <div class="col-md-6">
+                                        <strong>Username:</strong>
+                                        <p>{{ athlete.username }}</p>
+                                
+                                        <strong>Email:</strong>
+                                        <p>{{ athlete.email }}</p>
+                                
+                                        <strong>Full Name:</strong>
+                                        <p>{{ athlete.profile.fullname }}</p>
+                                
+                                        <strong>Bio:</strong>
+                                        <p>{{ athlete.profile.bio }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Gender:</strong>
+                                        <p>{{ athlete.profile.athlete_profile.gender }}</p>
+                                
+                                        <strong>Sports Category:</strong>
+                                        <p>{{ athlete.profile.athlete_profile.sportscategory }}</p>
+                                
+                                        <strong>College:</strong>
+                                        <p>{{ athlete.profile.athlete_profile.college.collegename if athlete.profile.athlete_profile.college else 'N/A' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+    
+    
+                            <div class="mb-3 text-center">
+    
+                            <a href="{{ url_for('send_message', receiver_id=athlete.userid) }}" 
+                            class="btn btn-outline-primary  w-75  my-4 ">Send Message</a>
+                            
+    
+                            {% if not is_in_watchlist %}
+                            <form method="POST" action="{{ url_for('add_to_watchlist', user_id=athlete.userid) }}">
+                                <input type="submit" class="btn btn-outline-primary" value="Add to Watchlist">
+                            </form>
+                            {% endif %}
+                            </div>
+    
+    
+                            <hr class="my-4" />
+    
+                            <div class="mb-3 flex flex-wrap text-center">
+    
+                             
+                            </div>
+                            <div class="mb-2 px-5">
+                                <h3>Sponsorship:</h3>
+    
+                                {% if sponsor_companies %}
+                                <p>This athlete is sponsored by:</p>
+                                <ul>
+                                    {% for company_name in sponsor_companies %}
+                                    <li><strong>{{ company_name }}</strong></li>
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                <p>This athlete is not sponsored by any company.</p>
+                                {% endif %}
+                            </div>
+                            <hr class="my-4" />
+                                <div class="text-center">
+
+                            <a href="{{ url_for('view_athletes') }}" class="btn btn-outline-info">Back to Athlete List</a>
+                        </div>
+    
+    
+                        </div>
+    
+                </div>
+    
+            </div>
+        </div>
+    
+    </div>
+
+    <!---------------------------------------------------
 <h2>{{ athlete.profile.fullname }}'s Profile</h2>
 
 <div>
@@ -78,6 +188,9 @@
 {% else %}
     <p>This athlete is not sponsored by any company.</p>
 {% endif %}
+
+
+
 <h3>Actions:</h3>
 
 {% if not is_in_watchlist %}
@@ -91,6 +204,7 @@
 
 <a href="{{ url_for('view_athletes') }}">Back to Athlete List</a>
 <a href="{{ url_for('company_dashboard') }}">Back to Dashboard</a>
-
+-->
 </body>
 </html>
+
