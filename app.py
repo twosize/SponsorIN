@@ -833,11 +833,11 @@ def send_message(receiver_id):
     if request.method == 'POST':
         content = request.form.get('content').strip()
         if content:
-            new_message = Message(senderid=current_user.userid, receiverid=receiver.userid, content=content)
+            new_message = Message(senderid=current_user.userid, receiverid=receiver_id, content=content)
             db.session.add(new_message)
             db.session.commit()
             flash('Message sent successfully!', 'success')
-            return redirect_to_dashboard()
+            return redirect(url_for('view_conversation', other_user_id=receiver_id))
         else:
             flash('Message cannot be empty!', 'danger')
 
