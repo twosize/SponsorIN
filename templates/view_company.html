@@ -53,7 +53,7 @@
         </thead>
         <tbody>
            {% for company, user_id in companies %}
-    <tr>
+          <tr>
         <td>
             {% if company.companylogo %}
                 <img src="{{ url_for('static', filename=company.companylogo) }}" alt="Company Logo" width="30">
