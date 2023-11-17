@@ -75,7 +75,7 @@
 
   <div class="text-center">
     <div class="row align-items-center  justify-content-center">
-      <div class="col-8 col-lg-3 border border-secondary bg-success-subtle rounded-4 m-2 p-2">
+      <div class="col-8 col-lg-3 border border-secondary bg-success-subtle rounded-4 m-2 p-2 align-self-start">
         <div class="container my-2">
           <img class="profile-picture" src="{{ url_for('static', filename='default_picture/default-admin.jpg') }}"
             alt="Default Profile Picture" />
@@ -111,7 +111,7 @@
 
         </div>
       </div>
-      <div class="col-12 col-lg-8 bg-success-subtle rounded-4 m-2 p-2 align-self-center ">
+      <div class="col-12 col-lg-8 bg-success-subtle rounded-4 m-2 p-2 border border-secondary align-self-center ">
         <div class="row my-2">
           <div class="col-6">
             <h3 class="fw-semibold">Athletes</h1>
@@ -133,227 +133,233 @@
 
 
             <!---------------------------------------------------------------------------->
-           <div class="album py-5">
-    <div class="container">
-        <div class="row">
-            {% for user in athletes %}
-                <div class="col-md-4">
+            <div class="album py-5">
+              <div class="container">
+                <div class="row">
+                  {% for user in athletes %}
+                  <div class="col-md-4">
 
-                  <div class="col">
-                    <div class="card shadow-sm">
+                    <div class="col">
+                      <div class="card shadow-sm">
 
-                      {% if user.profile and user.profile.profilepicture %}
-                      <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture"
-                        width="100%" height="225" class="rounded-3">
-                      {% else %}
-                      <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}"
-                        alt="Default Profile Picture" width="100%" height="225" class="rounded-3">
-                      {% endif %}
-
-
-
-                      <div class="card-body ">
-                        <h5 class="card-title justify-content-between ">
-                          {{ user.username }}
-
-
-                          <span class="badge bg-primary rounded-pill">
-                            {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile else
-                            'N/A'
-                            }}
-                          </span>
+                        {% if user.profile and user.profile.profilepicture %}
+                        <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture"
+                          width="100%" height="190" class="rounded-3">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}"
+                          alt="Default Profile Picture" width="100%" height="190" class="rounded-3">
+                        {% endif %}
 
 
 
-                          {% if user.profile and user.profile.verifiedstatus %}
-                          <span class="badge bg-success rounded-pill">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                              class="bi bi-check" viewBox="0 0 16 16">
-                              <path
-                                d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
-                            </svg>
+                        <div class="card-body">
+                          <h6 class="card-title ">
+                            {{ user.username }}
 
-                          </span>
-                          {% else %}
-                          <span class="badge bg-danger rounded-pill">
 
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                              class="bi bi-x" viewBox="0 0 16 16">
-                              <path
-                                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-                            </svg>
-                            {% endif %}
-                          </span>
-                        </h5>
+                            <span class="badge bg-primary rounded-pill">
+                              {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile
+                              else
+                              'N/A'
+                              }}
+                            </span>
 
-                        <p class="card-text">
-                        <ul class="list-group list-group-flush">
-                          <li class="list-group-item">Gender:
-                            {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile else
-                            'N/A'
-                            }}
-                          </li>
-                          <li class="list-group-item">
-                            verifiedstatus: {{ 'Yes' if user.profile and user.profile.verifiedstatus else 'No' }}
 
-                          </li>
-                        </ul>
 
-                        </p>
-                        <div class="d-flex justify-content-between align-items-center">
-                          <div class="btn-group">
-                            <a href="{{ url_for('edit_user', user_id=user.userid) }}"
-                              class="btn btn-sm btn-outline-success">Edit</a>
-                            <a href="{{ url_for('delete_user', user_id=user.userid) }}"
-                              onclick="return confirm('Are you sure you want to delete this user?');"
-                              class="btn btn-sm btn-outline-danger">Delete</a>
-                            <a href="{{ url_for('send_message', receiver_id=user.userid, admin_id=current_user.userid) }}"
-                              class="btn btn-sm btn-outline-primary">Message</a>
+                            {% if user.profile and user.profile.verifiedstatus %}
+                            <span class="badge bg-success rounded-pill">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-check" viewBox="0 0 16 16">
+                                <path
+                                  d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
+                              </svg>
+
+                            </span>
+                            {% else %}
+                            <span class="badge bg-danger rounded-pill">
+
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-x" viewBox="0 0 16 16">
+                                <path
+                                  d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                              </svg>
+                              {% endif %}
+                            </span>
+                          </h6>
+
+                          <p class="card-text">
+                          <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Gender:
+                              {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile
+                              else
+                              'N/A'
+                              }}
+                            </li>
+                            <li class="list-group-item">
+                              verifiedstatus: {{ 'Yes' if user.profile and user.profile.verifiedstatus else 'No' }}
+
+                            </li>
+                          </ul>
+
+                          </p>
+                          <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                              <a href="{{ url_for('edit_user', user_id=user.userid) }}"
+                                class="btn btn-sm btn-outline-success">Edit</a>
+                              <a href="{{ url_for('delete_user', user_id=user.userid) }}"
+                                onclick="return confirm('Are you sure you want to delete this user?');"
+                                class="btn btn-sm btn-outline-danger">Delete</a>
+                              <a href="{{ url_for('send_message', receiver_id=user.userid, admin_id=current_user.userid) }}"
+                                class="btn btn-sm btn-outline-primary">Message</a>
+                            </div>
+                            <small class="text-body-secondary">ID:
+                              {{ user.userid }}
+
+                            </small>
                           </div>
-                          <small class="text-body-secondary">ID:
-                            {{ user.userid }}
-
-                          </small>
                         </div>
                       </div>
                     </div>
+
+
+
+
                   </div>
-
-
-
-
-                </div>
-                      {% endfor %}
-
-              </div>
-            </div>
-          </div>
-
-
-        </div>
-
-        <hr class="my-4" />
-
-        <div class="row my-2">
-          <div class="col-6">
-            <h3 class="fw-semibold">Companies</h1>
-          </div>
-          <div class="col-4 text-end">
-            <form action="{{ url_for('company_user_list_page') }}" method="get">
-              <input class="btn btn-success" type="submit" value="Company User List" />
-            </form>
-          </div>
-
-        </div>
-        <div class="row" id="section2">
-          <div id="color-container1">
-
-
-            <!---------------------------------------------------------------------------->
-
-<div class="album py-5">
-    <div class="container">
-        <div class="row">
-            {% for user in companies %}
-                <div class="col-md-4">
-                  <div class="col">
-
-                    <div class="card shadow-sm">
-
-                      {% if user.profile and user.profile.profilepicture %}
-                      <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture"
-                        width="100%" height="225" class="rounded-3">
-                      {% else %}
-                      <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}"
-                        alt="Default Profile Picture" width="100%" height="225" class="rounded-3">
-                      {% endif %}
-
-
-
-                      <div class="card-body ">
-                        <h5 class="card-title justify-content-between ">
-                          {{ user.username }}
-
-
-                          <span class="badge bg-primary rounded-pill">
-                            {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile else
-                            'N/A'
-                            }}
-                          </span>
-
-
-
-                          {% if user.profile and user.profile.verifiedstatus %}
-                          <span class="badge bg-success rounded-pill">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                              class="bi bi-check" viewBox="0 0 16 16">
-                              <path
-                                d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
-                            </svg>
-
-                          </span>
-                          {% else %}
-                          <span class="badge bg-danger rounded-pill">
-
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                              class="bi bi-x" viewBox="0 0 16 16">
-                              <path
-                                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-                            </svg>
-                            {% endif %}
-                          </span>
-                        </h5>
-
-                        <p class="card-text">
-                        <ul class="list-group list-group-flush">
-                          <li class="list-group-item">Gender:
-                            {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile else
-                            'N/A'
-                            }}
-                          </li>
-                          <li class="list-group-item">
-                            verifiedstatus: {{ 'Yes' if user.profile and user.profile.verifiedstatus else 'No' }}
-
-                          </li>
-                        </ul>
-
-                        </p>
-                        <div class="d-flex justify-content-between align-items-center">
-                          <div class="btn-group">
-                            <a href="{{ url_for('edit_user', user_id=user.userid) }}"
-                              class="btn btn-sm btn-outline-success">Edit</a>
-                            <a href="{{ url_for('delete_user', user_id=user.userid) }}"
-                              onclick="return confirm('Are you sure you want to delete this user?');"
-                              class="btn btn-sm btn-outline-danger">Delete</a>
-                            <a href="{{ url_for('send_message', receiver_id=user.userid, admin_id=current_user.userid) }}"
-                              class="btn btn-sm btn-outline-primary">Message</a>
-                          </div>
-                          <small class="text-body-secondary">ID:
-                            {{ user.userid }}
-
-                          </small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
                   {% endfor %}
 
+                </div>
               </div>
             </div>
 
 
+          </div>
+
+          <hr class="my-4" />
+
+          <div class="row my-2">
+            <div class="col-6">
+              <h3 class="fw-semibold">Companies</h1>
+            </div>
+            <div class="col-4 text-end">
+              <form action="{{ url_for('company_user_list_page') }}" method="get">
+                <input class="btn btn-success" type="submit" value="Company User List" />
+              </form>
+            </div>
+
+          </div>
+          <div class="row" id="section2">
+            <div id="color-container1">
+
+
+              <!---------------------------------------------------------------------------->
+
+              <div class="album py-5">
+                <div class="container">
+                  <div class="row">
+                    {% for user in companies %}
+                    <div class="col-md-4">
+                      <div class="col">
+
+                        <div class="card shadow-sm">
+
+                          {% if user.profile and user.profile.profilepicture %}
+                          <img src="{{ url_for('static', filename=user.profile.profilepicture) }}" alt="Profile Picture"
+                            width="100%" height="190" class="rounded-3">
+                          {% else %}
+                          <img src="{{ url_for('static', filename='profile_picture/defualtpicture.png') }}"
+                            alt="Default Profile Picture" width="100%" height="190" class="rounded-3">
+                          {% endif %}
+
+
+
+                          <div class="card-body ">
+                            <h6 class="card-title justify-content-between ">
+                              {{ user.username }}
+
+
+                              <span class="badge bg-primary rounded-pill">
+                                {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile
+                                else
+                                'N/A'
+                                }}
+                              </span>
+
+
+
+                              {% if user.profile and user.profile.verifiedstatus %}
+                              <span class="badge bg-success rounded-pill">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                  class="bi bi-check" viewBox="0 0 16 16">
+                                  <path
+                                    d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
+                                </svg>
+
+                              </span>
+                              {% else %}
+                              <span class="badge bg-danger rounded-pill">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                  class="bi bi-x" viewBox="0 0 16 16">
+                                  <path
+                                    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                                </svg>
+                                {% endif %}
+                              </span>
+                            </h6>
+
+                            <p class="card-text">
+                            <ul class="list-group list-group-flush">
+                              <li class="list-group-item">Gender:
+                                {{ user.profile.athlete_profile.gender if user.profile and user.profile.athlete_profile
+                                else
+                                'N/A'
+                                }}
+                              </li>
+                              <li class="list-group-item">
+                                verifiedstatus: {{ 'Yes' if user.profile and user.profile.verifiedstatus else 'No' }}
+
+                              </li>
+                            </ul>
+
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                              <div class="btn-group">
+                                <a href="{{ url_for('edit_user', user_id=user.userid) }}"
+                                  class="btn btn-sm btn-outline-success">Edit</a>
+                                <a href="{{ url_for('delete_user', user_id=user.userid) }}"
+                                  onclick="return confirm('Are you sure you want to delete this user?');"
+                                  class="btn btn-sm btn-outline-danger">Delete</a>
+                                <a href="{{ url_for('send_message', receiver_id=user.userid, admin_id=current_user.userid) }}"
+                                  class="btn btn-sm btn-outline-primary">Message</a>
+                              </div>
+                              <small class="text-body-secondary">ID:
+                                {{ user.userid }}
+
+                              </small>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  </div>
   </div>
 
 
 </body>
 
 </html>
-<!--
- -->
+
+
+
+
