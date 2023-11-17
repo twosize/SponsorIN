@@ -17,7 +17,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisshouldbesecret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://brandontiong:BT2129bt@localhost:5432/sponsorin'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://egekeser:1954@localhost:5432/sponsorin'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -833,16 +833,15 @@ def send_message(receiver_id):
     if request.method == 'POST':
         content = request.form.get('content').strip()
         if content:
-            new_message = Message(senderid=current_user.userid, receiverid=receiver.userid, content=content)
+            new_message = Message(senderid=current_user.userid, receiverid=receiver_id, content=content)
             db.session.add(new_message)
             db.session.commit()
             flash('Message sent successfully!', 'success')
-            return redirect_to_dashboard()
+            return redirect(url_for('view_conversation', other_user_id=receiver_id))
         else:
             flash('Message cannot be empty!', 'danger')
 
     return render_template('send_message.html', receiver=receiver, user_type=current_user.usertype)
-
 def redirect_to_dashboard():
     if current_user.usertype == 'Admin':
         return redirect(url_for('admin_dashboard'))
