@@ -396,23 +396,19 @@ def delete_account():
     user_id = current_user.userid
 
     if request.method == 'POST':
-        # Delete messages related to the user
         Message.query.filter((Message.senderid == user_id) | (Message.receiverid == user_id)).delete()
 
-        # Find the profile and delete associated records
         profile = Profile.query.filter_by(userid=user_id).first()
         if profile:
             athlete_profile = AthleteProfile.query.filter_by(profileid=profile.profileid).first()
             company_profile = CompanyProfile.query.filter_by(profileid=profile.profileid).first()
 
             if athlete_profile:
-                # Delete any dependent records for athlete_profile (if any)
                 Watchlist.query.filter_by(athleteid=athlete_profile.athleteprofileid).delete()
                 Sponsorship.query.filter_by(athleteid=athlete_profile.athleteprofileid).delete()
                 db.session.delete(athlete_profile)
 
             if company_profile:
-                # Delete any dependent records for company_profile
                 Offer.query.filter_by(companyid=company_profile.companyprofileid).delete()
                 Watchlist.query.filter_by(companyid=company_profile.companyprofileid).delete()
                 Sponsorship.query.filter_by(companyid=company_profile.companyprofileid).delete()
@@ -420,7 +416,6 @@ def delete_account():
 
             db.session.delete(profile)
 
-        # Finally, delete the user
         User.query.filter_by(userid=user_id).delete()
 
         db.session.commit()
@@ -583,11 +578,15 @@ def view_athlete(user_id):
     athlete = User.query.get_or_404(user_id)
     sponsorships = Sponsorship.query.filter_by(athleteid=athlete.profile.athlete_profile.athleteprofileid).all()
     sponsor_companies = [CompanyProfile.query.get(s.companyid).companyname for s in sponsorships]
-    current_company_profile_id = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first().companyprofileid
+
+    current_company_profile_id = CompanyProfile.query.filter_by(
+        profileid=current_user.profile.profileid).first().companyprofileid
     is_in_watchlist = Watchlist.query.filter_by(athleteid=athlete.profile.athlete_profile.athleteprofileid,
                                                 companyid=current_company_profile_id).first() is not None
+    is_already_sponsored = any(s.companyid == current_company_profile_id for s in sponsorships)
+
     return render_template('athlete_detail.html', athlete=athlete, is_in_watchlist=is_in_watchlist,
-                           sponsor_companies=sponsor_companies)
+                           sponsor_companies=sponsor_companies, is_already_sponsored=is_already_sponsored)
 
 
 @app.route('/admin/dashboard')

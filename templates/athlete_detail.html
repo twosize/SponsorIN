@@ -94,8 +94,10 @@
     
                             <a href="{{ url_for('send_message', receiver_id=athlete.userid) }}" 
                             class="btn btn-outline-primary  w-75  my-4 ">Send Message</a>
-                            
-    
+
+           {% if not is_already_sponsored %}
+    <a href="{{ url_for('send_offer', athlete_id=athlete.profile.athlete_profile.athleteprofileid) }}" class="btn btn-outline-info my-2 w-75">Send Offer</a>
+    {% endif %}
                             {% if not is_in_watchlist %}
                             <form method="POST" action="{{ url_for('add_to_watchlist', user_id=athlete.userid) }}">
                                 <input type="submit" class="btn btn-outline-primary" value="Add to Watchlist">
