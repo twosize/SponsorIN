@@ -92,7 +92,13 @@
               <div class="btn-group" role="group" aria-label="Button group">
                   <a href="{{ url_for('view_athlete', user_id=athlete.profile.appuser.userid) }}" class="btn btn-primary">View</a>
                   <a href="{{ url_for('send_message', receiver_id=athlete.profile.appuser.userid) }}" class="btn btn-secondary">Send Message</a>
-                  <form method="POST" style="display: inline" action="{{ url_for('remove_from_watchlist', athlete_id=athlete.athleteprofileid) }}">
+               {% if athlete.athleteprofileid not in sponsored_athletes %}
+            <a href="{{ url_for('send_offer', athlete_id=athlete.athleteprofileid) }}"
+                class="btn btn-sm btn-outline-primary">Send Offer</a>
+            {% else %}
+            <span>Already Sponsored</span>
+            {% endif %}
+                <form method="POST" style="display: inline" action="{{ url_for('remove_from_watchlist', athlete_id=athlete.athleteprofileid) }}">
                       <button type="submit" class="btn btn-danger">Remove</button>
                   </form>
               </div>

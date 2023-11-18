@@ -463,13 +463,14 @@ def company_dashboard():
 def view_watchlist():
     company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
 
-
     watchlist_athletes = db.session.query(AthleteProfile, Profile) \
         .join(Profile, AthleteProfile.profileid == Profile.profileid) \
         .join(Watchlist, Watchlist.athleteid == AthleteProfile.athleteprofileid) \
         .filter(Watchlist.companyid == company_profile.companyprofileid).all()
 
-    return render_template('watchlist.html', watchlist_athletes=watchlist_athletes)
+    sponsored_athletes = [offer.athleteid for offer in Offer.query.filter_by(companyid=company_profile.companyprofileid, status='Accepted').all()]
+
+    return render_template('watchlist.html', watchlist_athletes=watchlist_athletes, sponsored_athletes=sponsored_athletes)
 
 
 @app.route('/add_to_watchlist/<int:user_id>', methods=['POST'])
