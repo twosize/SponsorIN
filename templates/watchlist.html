@@ -60,6 +60,7 @@
           <th scope="col">Gender</th>
           <th scope="col">College</th>
           <th scope="col">Sports Catergory</th>
+          <th scope="col">Sponsor Status</th>
           <th scope="col">Actions</th>
         </tr>
       </thead>
@@ -88,20 +89,27 @@
               {{ athlete.college.collegename if athlete.college else 'N/A' }}
             </td>
             <td>{{ athlete.sportscategory }}</td>
-            <td>
-              <div class="btn-group" role="group" aria-label="Button group">
-                  <a href="{{ url_for('view_athlete', user_id=athlete.profile.appuser.userid) }}" class="btn btn-primary">View</a>
-                  <a href="{{ url_for('send_message', receiver_id=athlete.profile.appuser.userid) }}" class="btn btn-secondary">Send Message</a>
-               {% if athlete.athleteprofileid not in sponsored_athletes %}
-            <a href="{{ url_for('send_offer', athlete_id=athlete.athleteprofileid) }}"
-                class="btn btn-sm btn-outline-primary">Send Offer</a>
+            <td class="text-center">
+              {% if athlete.athleteprofileid not in sponsored_athletes %}
+              <a href="{{ url_for('send_offer', athlete_id=athlete.athleteprofileid) }}"
+                class="btn btn-outline-primary">Send Offer</a>
             {% else %}
-            <span>Already Sponsored</span>
+            <button type="button" class="btn btn-outline-primary" disabled>Send Offer</button>
+
             {% endif %}
-                <form method="POST" style="display: inline" action="{{ url_for('remove_from_watchlist', athlete_id=athlete.athleteprofileid) }}">
-                      <button type="submit" class="btn btn-danger">Remove</button>
-                  </form>
-              </div>
+            </td>
+            <td>
+              <div class="d-flex justify-content-evenly">
+
+              <div class="btn-group" role="group" aria-label="Button group">
+                <a href="{{ url_for('view_athlete', user_id=athlete.profile.appuser.userid) }}" class="btn btn-primary">View</a>
+                <a href="{{ url_for('send_message', receiver_id=athlete.profile.appuser.userid) }}" class="btn btn-secondary">Send Message</a>
+            </div>
+            <form method="POST" class="d-inline-block" action="{{ url_for('remove_from_watchlist', athlete_id=athlete.athleteprofileid) }}">
+              <button type="submit" class="btn btn-danger">Remove</button>
+            </form>
+          </div>
+
           </td>
         </tr>
         {% else %} 
