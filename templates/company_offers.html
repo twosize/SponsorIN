@@ -31,39 +31,38 @@
 </head>
 
 
-    <header
-        class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom m-2 p-5 bg-primary-subtle rounded-4">
-        <div class="col-md-3 mb-md-0 mb-md-0">
-            <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
-                <img src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}" alt="SponsorIn_Logo"
-                    style="width: 300px; height: 120px" />
-            </a>
-        </div>
-        <div class="col-sm-3 text-center">
-            <h2 class="fw-bold">Company Offers</h2>
+<header
+    class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom m-2 p-5 bg-primary-subtle rounded-4">
+    <div class="col-md-3 mb-md-0 mb-md-0">
+        <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
+            <img src="{{ url_for('static', filename='images/SponsorIN_Logo_White.png') }}" alt="SponsorIn_Logo"
+                style="width: 300px; height: 120px" />
+        </a>
+    </div>
+    <div class="col-sm-3 text-center">
+        <h2 class="fw-bold">Company Offers</h2>
 
-        </div>
-        <div class="col-md-3 text-end">
-            <a href="{{ url_for('company_dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
-        </div>
-    </header>
+    </div>
+    <div class="col-md-3 text-end">
+        <a href="{{ url_for('company_dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+    </div>
+</header>
 
 <body>
 
-    
+
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <ul class="flashes">
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
     {% endwith %}
-    <div
-    class="continer my-4 text-center">
-    <a href="{{ url_for('company_offer_history') }}" class="btn btn-info">View Offer History</a>
-</div>
+    <div class="continer my-4 text-center">
+        <a href="{{ url_for('company_offer_history') }}" class="btn btn-info">View Offer History</a>
+    </div>
 
     <div class="container my-4 rounded-3" id="merge">
         <table class="table table-striped-columns border border-warning-subtle" border="1">
@@ -80,19 +79,28 @@
                 {% for offer, athlete_profile, profile in offers %}
                 <tr>
                     <td>
-                        <img src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture" width="30">
+                        <img src="{{ url_for('static', filename=profile.profilepicture) }}" alt="Profile Picture"
+                            width="30">
                     </td>
                     <td>{{ profile.fullname }}</td>
                     <td>{{ offer.details }}</td>
                     <td>{{ offer.status }}</td>
                     <td>
                         {% if offer.status == 'Counter-offered' %}
-                            <a href="{{ url_for('respond_offer', offer_id=offer.offerid) }}">Respond to Offer</a>
+                        <div class="btn-group" role="group" aria-label="Offer Actions">
+                            <a href="{{ url_for('respond_offer', offer_id=offer.offerid) }}"
+                                class="btn btn-primary">Respond to Offer</a>
+                        </div>
                         {% elif offer.status == 'Pending' %}
-                            <a href="{{ url_for('modify_offer', offer_id=offer.offerid) }}" class="button">Modify Offer</a>
+                        <div class="btn-group" role="group" aria-label="Offer Actions">
+                            <a href="{{ url_for('modify_offer', offer_id=offer.offerid) }}"
+                                class="btn btn-primary">Modify Offer</a>
                             <form action="{{ url_for('retract_offer', offer_id=offer.offerid) }}" method="post">
-                                <input type="submit" value="Retract Offer" onclick="return confirm('Are you sure you want to retract this offer?');">
+                                <input type="submit" value="Retract Offer"
+                                    onclick="return confirm('Are you sure you want to retract this offer?');"
+                                    class="btn btn-danger">
                             </form>
+                        </div>
                         {% endif %}
                     </td>
                 </tr>
@@ -100,7 +108,7 @@
             </tbody>
         </table>
     </div>
-<!-------
+    <!-------
     <div id="merge_main">
     <ul>
         {% for offer, athlete_profile, profile in offers %}
@@ -122,7 +130,7 @@
     </ul>
     <a href="{{ url_for('company_offer_history') }}" class="button">View Offer History</a>
 -->
-</div>
+    </div>
 </body>
-</html>
 
+</html>

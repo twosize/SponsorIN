@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.utils import secure_filename
 from sqlalchemy import and_
+from flask import session
 from werkzeug.security import check_password_hash
 from PIL import Image
 from sqlalchemy.exc import IntegrityError
@@ -17,7 +18,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thisshouldbesecret'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://egekeser:1954@localhost:5432/sponsorin'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://brandontiong:BT2129bt@localhost:5432/sponsorin'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -79,16 +80,16 @@ class CompanyProfile(db.Model):
 class Message(db.Model):
     __tablename__ = 'message'
     messageid = db.Column(db.Integer, primary_key=True)
-    senderid = db.Column(db.Integer, ForeignKey('appuser.userid'))
-    receiverid = db.Column(db.Integer, ForeignKey('appuser.userid'))
+    senderid = db.Column(db.Integer, ForeignKey('appuser.userid', ondelete='CASCADE'))
+    receiverid = db.Column(db.Integer, ForeignKey('appuser.userid', ondelete='CASCADE'))
     content = db.Column(db.Text)
     timestamp = db.Column(db.TIMESTAMP, default=db.func.current_timestamp())
 
 class Offer(db.Model):
     __tablename__ = 'offer'
     offerid = db.Column(db.Integer, primary_key=True)
-    companyid = db.Column(db.Integer, ForeignKey('companyprofile.companyprofileid'))
-    athleteid = db.Column(db.Integer, ForeignKey('athleteprofile.athleteprofileid'))
+    companyid = db.Column(db.Integer, ForeignKey('companyprofile.companyprofileid', ondelete='CASCADE'))
+    athleteid = db.Column(db.Integer, ForeignKey('athleteprofile.athleteprofileid', ondelete='CASCADE'))
     details = db.Column(db.Text)
     status = db.Column(Enum('Pending', 'Accepted', 'Declined', 'Counter-offered', name='offerstatus'), default='Pending')
     last_updated_by = db.Column(Enum('Company', 'Athlete', name='updatedbytype'), nullable=True)
@@ -96,15 +97,15 @@ class Offer(db.Model):
 class Watchlist(db.Model):
     __tablename__ = 'watchlist'
     watchlistid = db.Column(db.Integer, primary_key=True)
-    companyid = db.Column(db.Integer, ForeignKey('companyprofile.companyprofileid'))
-    athleteid = db.Column(db.Integer, ForeignKey('athleteprofile.athleteprofileid'))
+    companyid = db.Column(db.Integer, ForeignKey('companyprofile.companyprofileid', ondelete='CASCADE'))
+    athleteid = db.Column(db.Integer, ForeignKey('athleteprofile.athleteprofileid', ondelete='CASCADE'))
     sportscategory = db.Column(Enum('Basketball', 'Football', 'Soccer', name='sportscategorytype'))
 
 class Sponsorship(db.Model):
     __tablename__ = 'sponsorship'
     sponsorshipid = db.Column(db.Integer, primary_key=True)
-    companyid = db.Column(db.Integer, ForeignKey('companyprofile.companyprofileid'))
-    athleteid = db.Column(db.Integer, ForeignKey('athleteprofile.athleteprofileid'))
+    companyid = db.Column(db.Integer, ForeignKey('companyprofile.companyprofileid', ondelete='CASCADE'))
+    athleteid = db.Column(db.Integer, ForeignKey('athleteprofile.athleteprofileid', ondelete='CASCADE'))
     startdate = db.Column(db.TIMESTAMP, default=db.func.current_timestamp())
     enddate = db.Column(db.TIMESTAMP)
     details = db.Column(db.Text)
@@ -392,30 +393,44 @@ def upload_file():
 @app.route('/delete_account', methods=['GET', 'POST'])
 @login_required
 def delete_account():
-    user = User.query.get(current_user.userid)
+    user_id = current_user.userid
 
     if request.method == 'POST':
-        if user:
-            profile = Profile.query.filter_by(userid=current_user.userid).first()
+        Message.query.filter((Message.senderid == user_id) | (Message.receiverid == user_id)).delete()
 
-            if profile:
-                athlete_profile = AthleteProfile.query.filter_by(profileid=profile.profileid).first()
-                company_profile = CompanyProfile.query.filter_by(profileid=profile.profileid).first()
+        profile = Profile.query.filter_by(userid=user_id).first()
+        if profile:
+            athlete_profile = AthleteProfile.query.filter_by(profileid=profile.profileid).first()
+            company_profile = CompanyProfile.query.filter_by(profileid=profile.profileid).first()
 
-                if athlete_profile:
-                    db.session.delete(athlete_profile)
-                elif company_profile:
-                    db.session.delete(company_profile)
+            if athlete_profile:
+                Watchlist.query.filter_by(athleteid=athlete_profile.athleteprofileid).delete()
+                Sponsorship.query.filter_by(athleteid=athlete_profile.athleteprofileid).delete()
+                db.session.delete(athlete_profile)
 
-                db.session.delete(profile)
+            if company_profile:
+                Offer.query.filter_by(companyid=company_profile.companyprofileid).delete()
+                Watchlist.query.filter_by(companyid=company_profile.companyprofileid).delete()
+                Sponsorship.query.filter_by(companyid=company_profile.companyprofileid).delete()
+                db.session.delete(company_profile)
 
-            db.session.delete(user)
-            db.session.commit()
+            db.session.delete(profile)
 
-            flash('Your account and profile have been deleted', 'success')
-            return redirect(url_for('goodbye'))
+        User.query.filter_by(userid=user_id).delete()
+
+        db.session.commit()
+
+        flash('Your account and profile have been deleted', 'success')
+        logout_user()
+        session.clear()
+
+        return redirect(url_for('goodbye'))
 
     return render_template('delete_account.html')
+
+
+
+
 @app.route('/goodbye')
 def goodbye():
     return render_template('goodbye.html')
@@ -443,13 +458,14 @@ def company_dashboard():
 def view_watchlist():
     company_profile = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first()
 
-
     watchlist_athletes = db.session.query(AthleteProfile, Profile) \
         .join(Profile, AthleteProfile.profileid == Profile.profileid) \
         .join(Watchlist, Watchlist.athleteid == AthleteProfile.athleteprofileid) \
         .filter(Watchlist.companyid == company_profile.companyprofileid).all()
 
-    return render_template('watchlist.html', watchlist_athletes=watchlist_athletes)
+    sponsored_athletes = [offer.athleteid for offer in Offer.query.filter_by(companyid=company_profile.companyprofileid, status='Accepted').all()]
+
+    return render_template('watchlist.html', watchlist_athletes=watchlist_athletes, sponsored_athletes=sponsored_athletes)
 
 
 @app.route('/add_to_watchlist/<int:user_id>', methods=['POST'])
@@ -562,11 +578,15 @@ def view_athlete(user_id):
     athlete = User.query.get_or_404(user_id)
     sponsorships = Sponsorship.query.filter_by(athleteid=athlete.profile.athlete_profile.athleteprofileid).all()
     sponsor_companies = [CompanyProfile.query.get(s.companyid).companyname for s in sponsorships]
-    current_company_profile_id = CompanyProfile.query.filter_by(profileid=current_user.profile.profileid).first().companyprofileid
+
+    current_company_profile_id = CompanyProfile.query.filter_by(
+        profileid=current_user.profile.profileid).first().companyprofileid
     is_in_watchlist = Watchlist.query.filter_by(athleteid=athlete.profile.athlete_profile.athleteprofileid,
                                                 companyid=current_company_profile_id).first() is not None
+    is_already_sponsored = any(s.companyid == current_company_profile_id for s in sponsorships)
+
     return render_template('athlete_detail.html', athlete=athlete, is_in_watchlist=is_in_watchlist,
-                           sponsor_companies=sponsor_companies)
+                           sponsor_companies=sponsor_companies, is_already_sponsored=is_already_sponsored)
 
 
 @app.route('/admin/dashboard')
@@ -628,20 +648,40 @@ def edit_user(user_id):
 @app.route('/admin/delete_user/<int:user_id>')
 @login_required
 def delete_user(user_id):
-
     if current_user.usertype != 'Admin':
         flash('Permission Denied: You are not an administrator', 'danger')
         return redirect(url_for('index'))
 
     user = User.query.get(user_id)
-
     if user is None:
         flash('User not found', 'danger')
         return redirect(url_for('admin_dashboard'))
+
+    Message.query.filter((Message.senderid == user_id) | (Message.receiverid == user_id)).delete()
+
+    profile = Profile.query.filter_by(userid=user_id).first()
+    if profile:
+        athlete_profile = AthleteProfile.query.filter_by(profileid=profile.profileid).first()
+        if athlete_profile:
+            Offer.query.filter_by(athleteid=athlete_profile.athleteprofileid).delete()
+            Watchlist.query.filter_by(athleteid=athlete_profile.athleteprofileid).delete()
+            Sponsorship.query.filter_by(athleteid=athlete_profile.athleteprofileid).delete()
+            db.session.delete(athlete_profile)
+
+        company_profile = CompanyProfile.query.filter_by(profileid=profile.profileid).first()
+        if company_profile:
+            Offer.query.filter_by(companyid=company_profile.companyprofileid).delete()
+            Watchlist.query.filter_by(companyid=company_profile.companyprofileid).delete()
+            Sponsorship.query.filter_by(companyid=company_profile.companyprofileid).delete()
+            db.session.delete(company_profile)
+
+        db.session.delete(profile)
+
     db.session.delete(user)
     db.session.commit()
     flash(f'Successfully deleted {user.username}', 'success')
     return redirect(url_for('admin_dashboard'))
+
 
 
 @app.route('/admin/unverified_profiles')
@@ -842,6 +882,7 @@ def send_message(receiver_id):
             flash('Message cannot be empty!', 'danger')
 
     return render_template('send_message.html', receiver=receiver, user_type=current_user.usertype)
+
 def redirect_to_dashboard():
     if current_user.usertype == 'Admin':
         return redirect(url_for('admin_dashboard'))
